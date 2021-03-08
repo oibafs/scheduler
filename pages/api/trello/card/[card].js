@@ -259,8 +259,6 @@ async function runQuery(url, method, auth, json) {
   const contentType = json.body ? "application/json" : "text/plain"
   let response;
 
-  console.log(url);
-
   if (method == "GET") {
 
     return fetch(url, {
@@ -340,7 +338,6 @@ export default async function getCard(request,response) {
   const cardResponse = await runQuery(`https://api.trello.com/1/cards/${card}/?`, "GET", auth, getData);
 
   if (cardResponse.status == 200) {
-    console.log(cardResponse.text);
     const cardJson = cardResponse.text;
  
     returnJson.due = cardJson.due;

@@ -12,10 +12,11 @@ export default async function repeat(req, res) {
   if (req.method === "PUT") {
 
     // Get info from original card
+
     const auth = {
       key: key,
       token: token
-    }
+    };
   
     const params = { 
       params : {

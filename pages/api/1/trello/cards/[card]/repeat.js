@@ -9,7 +9,7 @@ export default async function repeat(req, res) {
   const { card } = req.query;
   const { body } = req;
 
-  if (req.method === "PUT") {
+  if (req.method === "POST") {
 
     // Get info from original card
 
@@ -200,16 +200,8 @@ export default async function repeat(req, res) {
 
                 if (changeCLRes.status === 200) {
             
-                  res.status(200).json({
-                    cardJson,
-                    start,
-                    due,
-                    customFields,
-                    checkLists,
-                    card,
-                    copyRes,
-                    copyJson,
-                    changeMainRes
+                  res.status(201).json({
+                    newCard
                   })
       
                 } else { // Error changing check list items
@@ -238,7 +230,7 @@ export default async function repeat(req, res) {
         });
       }
 
-    } else { // Error get card
+    } else { // Error getting card
       res.status(cardRes.status).send(cardRes.text);
     }
 

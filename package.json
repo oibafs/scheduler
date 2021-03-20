@@ -4,7 +4,8 @@
   "description": "Card scheduler for Trello",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev"
+    "dev": "next dev",
+    "debug": "NODE_OPTIONS='--inspect' next dev"
   },
   "repository": {
     "type": "git",

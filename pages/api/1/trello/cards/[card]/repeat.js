@@ -199,7 +199,7 @@ export default async function repeat(req, res) {
 
                 if (changeCLRes.status === 200) {
             
-                  res.status(200).json({
+                  res.status(201).json({
                     newCard
                   })
       

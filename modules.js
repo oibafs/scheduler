@@ -1,7 +1,8 @@
-export async function runQuery(url, method, auth, json) {
+export async function runQuery(url, method, json, simulation) {
   const queryParser = require("querystring");
   let params = {};
-  params = Object.assign(params, auth);
+  json = json ? json : {};
+  params = Object.assign(params, getAuth());
   params = Object.assign(params, json.params);
   const query = queryParser.stringify(params);
   url = url + query;
@@ -32,28 +33,40 @@ export async function runQuery(url, method, auth, json) {
 
   } else {
 
-    return fetch(url, {
-      method : method,
-      body : body,
-      headers : {
-        'Content-Type' : contentType
-      }
-    })
-    .then(response => response.text()
-      .then(text => {
+    if (!simulation) {
 
-        if (response.ok) {
-          text = JSON.parse(text);
+      return fetch(url, {
+        method : method,
+        body : body,
+        headers : {
+          'Content-Type' : contentType
         }
-
-        return {
-          status : response.status,
-          statusText : response.statusText,
-          text : text
-        }
-
       })
-    )
+      .then(response => response.text()
+        .then(text => {
+
+          if (response.ok) {
+            text = JSON.parse(text);
+          }
+
+          return {
+            status : response.status,
+            statusText : response.statusText,
+            text : text
+          }
+
+        })
+      )
+
+    } else {
+
+      return {
+        status : 200,
+        statusText : "Ok",
+        text : {}
+      }
+
+    }
 
   }
 
@@ -226,21 +239,19 @@ export function postponeByRules(json) {
   const daysPostponable = setDaysPostponable(json.customFields.["Days postponable"], json.customFields.Priority);
   const recurring = json.customFields.Recurring ? parseInt(json.customFields.Recurring) : 0;
   const today = new Date();
-  const checkListHours = 21;
+  const checkListHours = process.env.CHECKLISTHOURS;
   let earlierDate;
   let laterDate;
-
   today.setUTCHours(0,0,0,0);
-
+  const tomorrow = addDays(today, 1, actionDays, today);
   putJson.checkListItems = [];
 
   for (let i = 0; i < json.checkListItems.length; i ++) {
     let dueDate = new Date(json.checkListItems[i].due);
-    const tomorrow = addDays(today, 1, actionDays, today);
-
+  
     if(dueDate < tomorrow) {
       dueDate = addDays(dueDate, daysPostponable, actionDays, today);
-      dueDate.setUTCHours(checkListHours);
+//      dueDate.setUTCHours(checkListHours);
       json.checkListItems[i].due = dueDate;
 
       putJson.checkListItems.push({
@@ -259,32 +270,36 @@ export function postponeByRules(json) {
   putJson.customFields = [];
   let nextAction = new Date(json.customFields.["Next action"]);
 
-  if (json.customFields.["Next action"]) {
-    nextAction.setUTCFullYear(earlierDate.getUTCFullYear());
-    nextAction.setUTCMonth(earlierDate.getUTCMonth());
-    nextAction.setUTCDate(earlierDate.getUTCDate());  
-  } else {
-    nextAction = earlierDate;
-  }
+  if (earlierDate) {
 
-  if (JSON.stringify(nextAction) != JSON.stringify(json.customFields.["Next action"])) {
-    json.customFields.["Next action"] = nextAction;
+    if (json.customFields.["Next action"]) {
+      nextAction.setUTCFullYear(earlierDate.getUTCFullYear());
+      nextAction.setUTCMonth(earlierDate.getUTCMonth());
+      nextAction.setUTCDate(earlierDate.getUTCDate());  
+    } else {
+      nextAction = earlierDate;
+    }
 
-    putJson.customFields.push({
-      idCustomField : json.customFields.["idCustomFieldNext action"],
-      body : {
-        value : {
-          date : JSON.parse(JSON.stringify(json.customFields.["Next action"]))
+    if (JSON.stringify(nextAction) != JSON.stringify(json.customFields.["Next action"])) {
+      json.customFields.["Next action"] = nextAction;
+
+      putJson.customFields.push({
+        idCustomField : json.customFields.["idCustomFieldNext action"],
+        body : {
+          value : {
+            date : JSON.parse(JSON.stringify(json.customFields.["Next action"]))
+          }
         }
-      }
-    });
-  
-  };
+      });
+    
+    };
+
+  }
 
   // 3. due date -> if lower than later date => original date + postponable weeks -> if greater than today + recurring => later date
   let due = new Date(json.due);
 
-  if (due < laterDate || !json.due) {
+  if ((due < laterDate || !json.due) && laterDate) {
 
     if (!json.due) {
       due = laterDate;
@@ -346,4 +361,104 @@ function setDaysPostponable(daysPostponable, priority) {
   }
 
   return days;
+}
+
+export async function postponeCard(card, simulation) {
+
+  const params = { 
+    params : {
+      fields: "name,start,due,idBoard",
+      customFields: "true",
+      customFieldItems: "true",
+      checklists: "all"
+    }
+  };
+
+  const cardRes = await runQuery(`https://api.trello.com/1/cards/${card}/?`, "GET", params);
+
+  if (cardRes.status === 200) {
+
+    // Calculate new dates
+    const cardJson = cardRes.text;
+    console.log(`${cardJson.id} ${cardJson.name}`);
+    let returnJson = {};
+    returnJson.due = cardJson.due;
+    returnJson.customFields = getCustomFields(cardJson);
+    returnJson.checkListItems = getCheckListItems(cardJson);  
+    const putJson = postponeByRules(returnJson);
+
+    // Start updates
+    let putResponse = [];
+
+    // Update main fields
+    if (putJson.main) {
+      const putRes = await runQuery(`https://api.trello.com/1/cards/${card}/?`, "PUT", putJson.main, simulation);
+
+      const putResJson = {
+        action: "PUT - Change main fields",
+        status: putRes.status,
+        statusText: putRes.statusText,
+        text: (putRes.status === 200) ? putJson.main : putRes.text
+      };
+
+      putResponse.push(putResJson);
+    }
+
+    // Update custom fields
+    for (let i = 0; i < putJson.customFields.length; i ++) {
+      const putRes = await runQuery(`https://api.trello.com/1/cards/${card}/customField/${putJson.customFields[i].idCustomField}/item?`, "PUT", putJson.customFields[i], simulation);
+
+      const putResJson = {
+        action: `PUT - Change custom field ${i}`,
+        status: putRes.status,
+        statusText: putRes.statusText,
+        text: (putRes.status === 200) ? putJson.customFields[i] : putRes.text
+      };
+
+      putResponse.push(putResJson);
+    }
+
+    // Update check list items
+    for (let i = 0; i < putJson.checkListItems.length; i ++) {
+      const putRes = await runQuery(`https://api.trello.com/1/cards/${card}/checkItem/${putJson.checkListItems[i].id}?`, "PUT", putJson.checkListItems[i], simulation);
+
+      const putResJson = {
+        action: `PUT - Change check list item ${i}`,
+        status: putRes.status,
+        statusText: putRes.statusText,
+        text: (putRes.status === 200) ? putJson.checkListItems[i] : putRes.text
+      };
+
+      putResponse.push(putResJson);     
+    }
+
+    // Post result as a comment to the card
+    const params = { 
+      params : {
+        text : JSON.stringify(putResponse)
+      }
+    };
+
+    if (putResponse.length != 0) {
+      await runQuery(`https://api.trello.com/1/cards/${card}/actions/comments?`, "POST", params, simulation);
+    }
+
+    putResponse.status = 200;
+    return putResponse;
+
+  } else {
+    return cardRes;
+  }
+
+}
+
+function getAuth() {
+  const key = process.env.TRELLOKEY;
+  const token = process.env.TRELLOTOKEN;
+
+  return {
+    key: key,
+    token: token
+  }
+
 }

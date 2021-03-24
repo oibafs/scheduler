@@ -94,14 +94,13 @@ function postponeByRules(json) {
   // 1. checklist overdue -> due + postponable (consider action days): if still overdue => today
   //    checklist due today -> due + postponable (consider action days)
   const actionDays = json.customFields.["Action days"] ? json.customFields.["Action days"] : "Any day";
-  const daysPostponable = setDaysPostponable(json.customFields.["Days postponable"], json.customFields.Priority);
   const recurring = json.customFields.Recurring ? parseInt(json.customFields.Recurring) : 0;
+  const daysPostponable = setDaysPostponable(json.customFields.["Days postponable"], json.customFields.Priority, recurring);
   const today = new Date();
-  const checkListHours = process.env.CHECKLISTHOURS;
-  let earlierDate;
-  let laterDate;
   today.setUTCHours(0,0,0,0);
   const tomorrow = addDays(today, 1, actionDays, today);
+  let earlierDate;
+  let laterDate;
   putJson.checkListItems = [];
 
   for (let i = 0; i < json.checkListItems.length; i ++) {
@@ -109,7 +108,6 @@ function postponeByRules(json) {
   
     if(dueDate < tomorrow) {
       dueDate = addDays(dueDate, daysPostponable, actionDays, today);
-//      dueDate.setUTCHours(checkListHours);
       json.checkListItems[i].due = dueDate;
 
       putJson.checkListItems.push({
@@ -126,17 +124,9 @@ function postponeByRules(json) {
 
   // 2. next action -> same date as earlier checklist item
   putJson.customFields = [];
-  let nextAction = new Date(json.customFields.["Next action"]);
 
   if (earlierDate) {
-
-    if (json.customFields.["Next action"]) {
-      nextAction.setUTCFullYear(earlierDate.getUTCFullYear());
-      nextAction.setUTCMonth(earlierDate.getUTCMonth());
-      nextAction.setUTCDate(earlierDate.getUTCDate());  
-    } else {
-      nextAction = earlierDate;
-    }
+    let nextAction = earlierDate;
 
     if (JSON.stringify(nextAction) != JSON.stringify(json.customFields.["Next action"])) {
       json.customFields.["Next action"] = nextAction;
@@ -167,11 +157,10 @@ function postponeByRules(json) {
 
     let nextRecurrent = new Date(today);
     nextRecurrent.setUTCDate(nextRecurrent.getUTCDate() + recurring);
+    nextRecurrent.setUTCHours(due.getUTCHours(), due.getUTCMinutes(), due.getUTCSeconds(), 0);
 
     if (recurring > 0 && due > nextRecurrent) {
-      due.setUTCFullYear(laterDate.getUTCFullYear());
-      due.setUTCMonth(laterDate.getUTCMonth());
-      due.setUTCDate(laterDate.getUTCDate());
+      due = nextRecurrent;
     }
 
   }
@@ -190,7 +179,7 @@ function postponeByRules(json) {
   return putJson;
 }
 
-function setDaysPostponable(daysPostponable, priority) {
+function setDaysPostponable(daysPostponable, priority, recurring) {
   let days;
 
   if(daysPostponable) {
@@ -216,6 +205,10 @@ function setDaysPostponable(daysPostponable, priority) {
         break;
 
     }
+  }
+
+  if (days > recurring && recurring != 0) {
+    days = recurring;
   }
 
   return days;

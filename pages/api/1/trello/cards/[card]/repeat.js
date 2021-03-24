@@ -1,5 +1,5 @@
-import next from 'next';
-import { runQuery, getCustomFields, daysUntilRepeat, addDays, getCheckListItems, dateDiff } from '../../../../../../modules.js';
+import { runQuery, getCustomFields, getCheckListItems, addDays } from '../../../../../../modules/common.js';
+import { daysUntilRepeat, dateDiff } from '../../../../../../modules/repeat.js';
 
 export default async function repeat(req, res) {
   const key = process.env.TRELLOKEY;

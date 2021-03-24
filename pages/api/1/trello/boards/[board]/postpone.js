@@ -1,4 +1,5 @@
-import { runQuery, postponeCard } from '../../../../../../modules.js';
+import { runQuery } from '../../../../../../modules/common.js';
+import { postponeCard } from '../../../../../../modules/postpone.js';
 
 export default async function postpone(req, res) {
   const { board, simulation } = req.query;
@@ -19,20 +20,23 @@ export default async function postpone(req, res) {
         if (card.due && !card.dueComplete) {
           const cardRes = await postponeCard(card.id, simulation);
 
-          putResponse.push({
-            id: card.id,
-            name: card.name,
-            response: cardRes
-          })
+          if (cardRes.length != 0) {
+
+            putResponse.push({
+              id: card.id,
+              name: card.name,
+              response: cardRes
+            })
+  
+          }
 
         }
 
       }
+      
+      // Return
+      res.status(200).json(putResponse);
 
-      res.status(200).json({
-        putResponse
-      });
-    
     } else { // Error getting board
       res.status(boardRes.status).send(boardRes.text);
     }

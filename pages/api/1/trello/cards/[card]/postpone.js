@@ -1,4 +1,3 @@
-import next from 'next';
 import { runQuery, postponeCard } from '../../../../../../modules.js';
 
 export default async function postpone(req, res) {
@@ -12,9 +11,7 @@ export default async function postpone(req, res) {
     if (cardRes.status === 200) {
 
       // Return
-      res.status(200).json({
-        cardRes
-      });
+      res.status(200).json(cardRes);
     
     } else { // Error getting card
       res.status(cardRes.status).send(cardRes.text);

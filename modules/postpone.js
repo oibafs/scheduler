@@ -1,4 +1,4 @@
-import { runQuery, getCustomFields, getCheckListItems, addDays } from './common.js';
+import { runQuery, getCustomFields, getCheckListItems, addDays, daysUntilRepeat } from './common.js';
 
 export async function postponeCard(card, simulation) {
 
@@ -94,8 +94,7 @@ function postponeByRules(json) {
   // 1. checklist overdue -> due + postponable (consider action days): if still overdue => today
   //    checklist due today -> due + postponable (consider action days)
   const actionDays = json.customFields.["Action days"] ? json.customFields.["Action days"] : "Any day";
-  const recurring = json.customFields.Recurring ? parseInt(json.customFields.Recurring) : 0;
-  const daysPostponable = setDaysPostponable(json.customFields.["Days postponable"], json.customFields.Priority, recurring);
+  const recPeriod = json.customFields.["Recurring period"] ? json.customFields.["Recurring period"] : "days";
   const today = new Date();
   today.setUTCHours(0,0,0,0);
   const tomorrow = addDays(today, 1, actionDays, today);
@@ -107,6 +106,8 @@ function postponeByRules(json) {
     let dueDate = new Date(json.checkListItems[i].due);
   
     if(dueDate < tomorrow) {
+      const recurring = daysUntilRepeat(dueDate, json.customFields.Recurring ? parseInt(json.customFields.Recurring) : 0, recPeriod);
+      const daysPostponable = setDaysPostponable(json.customFields.["Days postponable"], json.customFields.Priority, recurring);
       dueDate = addDays(dueDate, daysPostponable, actionDays, today);
       json.checkListItems[i].due = dueDate;
 
@@ -148,6 +149,8 @@ function postponeByRules(json) {
   let due = new Date(json.due);
 
   if ((due < laterDate || !json.due) && laterDate) {
+    const recurring = daysUntilRepeat(due, json.customFields.Recurring ? parseInt(json.customFields.Recurring) : 0, recPeriod);
+    const daysPostponable = setDaysPostponable(json.customFields.["Days postponable"], json.customFields.Priority, recurring);
 
     if (!json.due) {
       due = laterDate;

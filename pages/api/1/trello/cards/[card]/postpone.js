@@ -1,4 +1,4 @@
-import { runQuery, postponeCard } from '../../../../../../modules.js';
+import { postponeCard } from '../../../../../../modules.js';
 
 export default async function postpone(req, res) {
   const { card, simulation } = req.query;

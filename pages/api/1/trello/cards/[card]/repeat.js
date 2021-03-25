@@ -11,11 +11,6 @@ export default async function repeat(req, res) {
   if (req.method === "POST") {
 
     // Get info from original card
-
-    const auth = {
-      key: key,
-      token: token
-    };
   
     const params = { 
       params : {
@@ -26,7 +21,7 @@ export default async function repeat(req, res) {
         }
     };
   
-    const cardRes = await runQuery(`https://api.trello.com/1/cards/${card}/?`, "GET", auth, params);
+    const cardRes = await runQuery(`https://api.trello.com/1/cards/${card}/?`, "GET", params);
 
     if (cardRes.status === 200) {
       const cardJson = cardRes.text;
@@ -48,7 +43,7 @@ export default async function repeat(req, res) {
           }
         }
 
-        const copyRes = await runQuery(`https://api.trello.com/1/cards/?`, "POST", auth, copyParams);
+        const copyRes = await runQuery(`https://api.trello.com/1/cards/?`, "POST", copyParams);
 
         if (copyRes.status === 200) {
           const copyJson = copyRes.text;
@@ -62,7 +57,7 @@ export default async function repeat(req, res) {
               }
           };
       
-          const getCheckListRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/?`, "GET", auth, paramsCL);
+          const getCheckListRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/?`, "GET", paramsCL);
 
           if (getCheckListRes.status === 200) {
             const checkListsJson = getCheckListRes.text;
@@ -165,7 +160,7 @@ export default async function repeat(req, res) {
             });
 
             // Change main fields of new card
-            const changeMainRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/?`, "PUT", auth, putJson.main);
+            const changeMainRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/?`, "PUT", putJson.main);
 
             if (changeMainRes.status === 200) {
 
@@ -173,7 +168,7 @@ export default async function repeat(req, res) {
               let changeCFRes;
 
               for (let i = 0; i < putJson.customFields.length; i ++) {
-                const changeCustomFieldRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/customField/${putJson.customFields[i].idCustomField}/item?`, "PUT", auth, putJson.customFields[i]);
+                const changeCustomFieldRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/customField/${putJson.customFields[i].idCustomField}/item?`, "PUT", putJson.customFields[i]);
                 changeCFRes = changeCustomFieldRes;
 
                 if (changeCustomFieldRes.status != 200) {
@@ -188,7 +183,7 @@ export default async function repeat(req, res) {
                 let changeCLRes;
 
                 for (let i = 0; i < putJson.checkListItems.length; i ++) {
-                  const changeCheckListRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/checkItem/${putJson.checkListItems[i].id}?`, "PUT", auth, putJson.checkListItems[i]);
+                  const changeCheckListRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/checkItem/${putJson.checkListItems[i].id}?`, "PUT", putJson.checkListItems[i]);
                   changeCLRes = changeCheckListRes;
 
                   if (changeCheckListRes.status != 200) {

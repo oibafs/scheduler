@@ -1,6 +1,6 @@
 import { runQuery, getCustomFields, getCheckListItems, addDays, daysUntilRepeat } from './common.js';
 
-export async function postponeCard(card, simulation) {
+export async function postponeCard(card, simulation, comment) {
 
   const params = { 
     params : {
@@ -75,7 +75,7 @@ export async function postponeCard(card, simulation) {
       }
     };
 
-    if (putResponse.length != 0) {
+    if (putResponse.length != 0 && comment) {
       await runQuery(`https://api.trello.com/1/cards/${card}/actions/comments?`, "POST", params, simulation);
     }
 

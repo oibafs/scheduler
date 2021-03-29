@@ -96,8 +96,8 @@ function postponeByRules(json) {
   const actionDays = json.customFields.["Action days"] ? json.customFields.["Action days"] : "Any day";
   const recPeriod = json.customFields.["Recurring period"] ? json.customFields.["Recurring period"] : "days";
   const today = new Date();
-  today.setUTCHours(0,0,0,0);
-  const tomorrow = addDays(today, 1, actionDays, today);
+  // today.setUTCHours(0,0,0,0);
+  // const tomorrow = addDays(today, 1, actionDays, today);
   let earlierDate;
   let laterDate;
   putJson.checkListItems = [];
@@ -105,7 +105,8 @@ function postponeByRules(json) {
   for (let i = 0; i < json.checkListItems.length; i ++) {
     let dueDate = new Date(json.checkListItems[i].due);
   
-    if(dueDate < tomorrow) {
+    // if(dueDate < tomorrow) {
+    if (dueDate < today) {
       const recurring = daysUntilRepeat(dueDate, json.customFields.Recurring ? parseInt(json.customFields.Recurring) : 0, recPeriod);
       const daysPostponable = setDaysPostponable(json.customFields.["Days postponable"], json.customFields.Priority, recurring);
       dueDate = addDays(dueDate, daysPostponable, actionDays, today);
@@ -155,14 +156,15 @@ function postponeByRules(json) {
     if (!json.due) {
       due = laterDate;
     } else {
+      const nextRecurrent = (recPeriod === "days") ? addDays(due, recurring, actionDays, due) : new Date(due.setUTCDate(due.getUTCDate() + recurring));
       due.setUTCDate(due.getUTCDate() + daysPostponable * 7);
     }
 
-    let nextRecurrent = new Date(today);
-    nextRecurrent.setUTCDate(nextRecurrent.getUTCDate() + recurring);
-    nextRecurrent.setUTCHours(due.getUTCHours(), due.getUTCMinutes(), due.getUTCSeconds(), 0);
+    // let nextRecurrent = new Date(today);
+    // nextRecurrent.setUTCDate(nextRecurrent.getUTCDate() + recurring);
+    // nextRecurrent.setUTCHours(due.getUTCHours(), due.getUTCMinutes(), due.getUTCSeconds(), 0);
 
-    if (recurring > 0 && due > nextRecurrent) {
+    if (recurring > 0 && nextRecurrent && due > nextRecurrent) {
       due = nextRecurrent;
     }
 

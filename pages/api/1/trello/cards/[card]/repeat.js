@@ -137,8 +137,9 @@ export default async function repeat(req, res) {
             }
 
             // Next action
-            const nextAction = new Date(customFields.["Next action"]);
-            customFields.["Next action"] = customFields.["Next action"] ? new Date(nextAction.setUTCDate(nextAction.getUTCDate() + dateDiff(nextAction, earliestDate))) : new Date(earliestDate);
+            // const nextAction = new Date(customFields.["Next action"]);
+            // customFields.["Next action"] = customFields.["Next action"] ? new Date(nextAction.setUTCDate(nextAction.getUTCDate() + dateDiff(nextAction, earliestDate))) : new Date(earliestDate);
+            customFields.["Next action"] = earliestDate ? earliestDate : start;
             
             putJson.customFields.push({
               idCustomField : customFields.["idCustomFieldNext action"],

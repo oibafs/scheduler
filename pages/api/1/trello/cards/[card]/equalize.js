@@ -1,12 +1,12 @@
 import { equalizeCard } from '../../../../../../modules/equalize.js';
 
 export default async function equalizeDates(req, res) {
-  const { card, simulation } = req.query;
+  const { card, simulation, comment } = req.query;
   
   if (req.method === "PUT") {
 
     // Equalize dates on card
-    const cardRes = await equalizeCard(card, simulation);
+    const cardRes = await equalizeCard(card, simulation, comment);
 
     if (cardRes.status === 200) {
 

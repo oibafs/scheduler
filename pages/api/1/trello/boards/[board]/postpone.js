@@ -2,7 +2,7 @@ import { runQuery } from '../../../../../../modules/common.js';
 import { postponeCard } from '../../../../../../modules/postpone.js';
 
 export default async function postpone(req, res) {
-  const { board, simulation } = req.query;
+  const { board, simulation, comment } = req.query;
 
   if (req.method === "PUT") {
 
@@ -18,7 +18,7 @@ export default async function postpone(req, res) {
         const card = boardJson[i];
 
         if (card.due && !card.dueComplete) {
-          const cardRes = await postponeCard(card.id, simulation);
+          const cardRes = await postponeCard(card.id, simulation, comment);
 
           if (cardRes.length != 0) {
 

@@ -1,12 +1,12 @@
 import { postponeCard } from '../../../../../../modules/postpone.js';
 
 export default async function postpone(req, res) {
-  const { card, simulation } = req.query;
+  const { card, simulation, comment } = req.query;
   
   if (req.method === "PUT") {
 
     // Postpone card
-    const cardRes = await postponeCard(card, simulation);
+    const cardRes = await postponeCard(card, simulation, comment);
 
     if (cardRes.status === 200) {
 

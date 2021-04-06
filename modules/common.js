@@ -1,8 +1,12 @@
-export async function runQuery(url, method, json, simulation) {
+export async function runQuery(url, method, json, simulation, noAuth) {
   const queryParser = require("querystring");
   let params = {};
   json = json ? json : {};
-  params = Object.assign(params, getAuth());
+
+  if (!noAuth) {
+    params = Object.assign(params, getAuth());
+  }
+  
   params = Object.assign(params, json.params);
   const query = queryParser.stringify(params);
   url = url + query;

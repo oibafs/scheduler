@@ -117,13 +117,13 @@ export function getCustomFields(cardJson) {
   for (let i = 0; i < cardJson.customFields.length; i ++) {
     const name = cardJson.customFields[i].name;
     const customFieldId = "idCustomField" + name;
-    json.[customFieldId] = cardJson.customFields[i].id;
+    json[customFieldId] = cardJson.customFields[i].id;
 
     for (let j = 0; j < (cardJson.customFields[i].options ? cardJson.customFields[i].options.length : 0); j ++) {
       const idValue = cardJson.customFields[i].options[j].id;
       const value = cardJson.customFields[i].options[j].value.text;
       const customFieldIdValue = "idCustomFieldValue" + name + value;
-      json.[customFieldIdValue] = idValue;
+      json[customFieldIdValue] = idValue;
     }
 
   }

@@ -25,11 +25,11 @@ export default async function repeat(req, res) {
 
     if (cardRes.status === 200) {
       const cardJson = cardRes.text;
-      const idList = cardJson.idList;
+      const idList = process.env.IDLIST;
       const customFields = getCustomFields(cardJson);
       let recurring = customFields.Recurring ? parseInt(customFields.Recurring) : 0;
-      const recPeriod = customFields.["Recurring period"] ? customFields.["Recurring period"] : "days";
-      const actionDays = customFields.["Action days"] ? customFields.["Action days"] : "Any day";
+      const recPeriod = customFields["Recurring period"] ? customFields["Recurring period"] : "days";
+      const actionDays = customFields["Action days"] ? customFields["Action days"] : "Any day";
   
       if (recurring != 0) {
 
@@ -97,23 +97,24 @@ export default async function repeat(req, res) {
             putJson.customFields = [];
 
             // Status
-            customFields.Status = "ToDo";
+            // Commented out because Butler is setting status according to the list the card is created in
+/*             customFields.Status = "To do";
 
             putJson.customFields.push({
               idCustomField : customFields.idCustomFieldStatus,
               body : {
-                  idValue : JSON.parse(JSON.stringify(customFields.idCustomFieldValueStatusToDo))
+                  idValue : JSON.parse(JSON.stringify(customFields["idCustomFieldValueStatusTo do"]))
               }
-            });
+            }); */
         
             // Start date (Custom fields)
             customFields["Start date"] = new Date(start);
 
             putJson.customFields.push({
-              idCustomField : customFields.["idCustomFieldStart date"],
+              idCustomField : customFields["idCustomFieldStart date"],
               body : {
                 value : {
-                  date : JSON.parse(JSON.stringify(customFields.["Start date"]))
+                  date : JSON.parse(JSON.stringify(customFields["Start date"]))
                 }
               }
             });
@@ -137,24 +138,22 @@ export default async function repeat(req, res) {
             }
 
             // Next action
-            // const nextAction = new Date(customFields.["Next action"]);
-            // customFields.["Next action"] = customFields.["Next action"] ? new Date(nextAction.setUTCDate(nextAction.getUTCDate() + dateDiff(nextAction, earliestDate))) : new Date(earliestDate);
-            customFields.["Next action"] = earliestDate ? earliestDate : start;
+            customFields["Next action"] = earliestDate ? earliestDate : start;
             
             putJson.customFields.push({
-              idCustomField : customFields.["idCustomFieldNext action"],
+              idCustomField : customFields["idCustomFieldNext action"],
               body : {
                 value : {
-                  date : JSON.parse(JSON.stringify(customFields.["Next action"]))
+                  date : JSON.parse(JSON.stringify(customFields["Next action"]))
                 }
               }
             });
 
             // Date concluded
-            customFields.["Date concluded"] = null;
+            customFields["Date concluded"] = null;
 
             putJson.customFields.push({
-              idCustomField : customFields.["idCustomFieldDate concluded"],
+              idCustomField : customFields["idCustomFieldDate concluded"],
               body : {
                 value : JSON.parse(JSON.stringify(""))
               }

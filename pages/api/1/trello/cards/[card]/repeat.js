@@ -1,3 +1,4 @@
+import next from 'next';
 import { runQuery, getCustomFields, getCheckListItems, addDays, daysUntilRepeat, dateDiff } from '../../../../../../modules/common.js';
 
 export default async function repeat(req, res) {
@@ -154,7 +155,15 @@ export default async function repeat(req, res) {
             }
 
             // Next action
-            customFields["Next action"] = earliestDate ? earliestDate : start;
+            if (earliestDate) { // first checklist item date
+              customFields["Next action"] = earliestDate;
+            } else if (customFields["Next action"]) { // card has next action date
+              let nextAction = new Date(customFields["Next action"]);
+              nextAction = (recPeriod === "days") ? addDays(nextAction, recurring, actionDays, nextAction) : new Date(nextAction.setUTCDate(nextAction.getUTCDate() + recurring));
+              customFields["Next action"] = new Date(nextAction);
+            } else {
+              customFields["Next action"] = start;
+            }
 
             putJson.customFields.push({
               idCustomField: customFields["idCustomFieldNext action"],
@@ -188,15 +197,13 @@ export default async function repeat(req, res) {
                 const changeCustomFieldRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/customField/${putJson.customFields[i].idCustomField}/item?`, "PUT", putJson.customFields[i]);
                 changeCFRes = changeCustomFieldRes;
 
-                console.log(putJson.customFields[i]);
-                console.log(changeCustomFieldRes.status);
                 if (changeCustomFieldRes.status != 200) {
                   break;
                 }
 
               }
 
-              if (changeCFRes.status === 200) {
+              if (putJson.customFields.length === 0 || changeCFRes.status === 200) {
 
                 // Change check list items of new card
                 let changeCLRes;
@@ -211,7 +218,7 @@ export default async function repeat(req, res) {
 
                 }
 
-                if (changeCLRes.status === 200) {
+                if (putJson.checkListItems.length === 0 || changeCLRes.status === 200) {
 
                   res.status(201).json({
                     newCard

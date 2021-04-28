@@ -8,7 +8,7 @@ export const joinCard = async (card: string, member: string) => {
     }
   };
 
-  const cardRes = await runQuery(`https://api.trello.com/1/cards/${card}/?`, "POST", params);
+  const cardRes = await runQuery(`https://api.trello.com/1/cards/${card}/idMembers?`, "POST", params);
   console.log(cardRes);
 
   return cardRes;

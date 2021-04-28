@@ -1,6 +1,6 @@
 import { runQuery } from "./common";
 
-const joinCard = async (card: string, member: string) => {
+export const joinCard = async (card: string, member: string) => {
 
   const params = {
     body: {

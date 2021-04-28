@@ -1,3 +1,5 @@
+const util = require('util');
+
 export default function callback(req, res) {
   const { body } = req;
 

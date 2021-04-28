@@ -1,4 +1,4 @@
-import { joinCard } from "../../../../../modules/webhooks";
+import { joinCard } from "../../../../../modules/webhooks.ts";
 
 export default function callback(req, res) {
   let ret = {

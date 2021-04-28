@@ -10,16 +10,19 @@ export default function callback(req, res) {
 
   // create card
   if (body.action.type === "createCard" && body.action.data.card.name.indexOf("https://") != 0) {
-    const resJoin = joinCard(body.action.data.card.id, body.action.idMemberCreator);
-    console.log(resJoin);
+    const resJoin = joinCard(body.action.data.card.id, body.action.idMemberCreator)
+      .then((res) => {
+        console.log(res);
 
-    ret.actions.push({
-      name: "joinCard",
-      status: resJoin.status,
-      result: resJoin.text,
-    });
-    status = resJoin.status != 200 ? resJoin.status : status;
+        ret.actions.push({
+          name: "joinCard",
+          status: res.status,
+          result: res.text,
+        });
+        status = res.status != 200 ? res.status : status;
+        res.status(status).json(ret);
+      });
+  } else {
+    res.status(status);
   }
-
-  res.status(status).json(ret);
 }

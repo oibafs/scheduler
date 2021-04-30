@@ -37,7 +37,7 @@ export const fillCardId = async (card) => {
   console.log("getCardRes", getCardRes);
 
   if (getCardRes.status === 200) {
-    const fieldCardId = getCardRes.text.customFields.filter(item => item.name)[0].id;
+    const fieldCardId = getCardRes.text.customFields.filter(item => item.name === "cardId")[0].id;
 
     const params = {
       body: {

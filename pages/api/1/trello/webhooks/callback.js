@@ -20,6 +20,7 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
+        console.log(status, ret);
         res.status(status).json(ret);
       });
 

@@ -1,13 +1,17 @@
 import { runQuery } from "./common";
 
-export const joinCard = async (card, member) => {
+export const joinCard = async (card: any, member: string) => {
 
   const params = {
     body: {
       value: member,
     }
   };
-  let result;
+
+  let result: {
+    status: number;
+    text: string;
+  };
 
   const cardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/idMembers?`, "POST", params);
 

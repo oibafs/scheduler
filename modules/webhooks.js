@@ -46,6 +46,7 @@ export const fillCardId = async (card) => {
         }
       }
     };
+    console.log("params", params);
 
     const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldCardId}/item?`, "PUT", params);
     console.log("putCustomFieldItemRes", putCustomFieldItemRes);

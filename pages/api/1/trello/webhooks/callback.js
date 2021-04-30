@@ -25,6 +25,6 @@ export default function callback(req, res) {
 
     // no action
   } else {
-    res.status(204).send();
+    res.status(200).send();
   }
 }

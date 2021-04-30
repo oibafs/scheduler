@@ -9,7 +9,7 @@ export default function callback(req, res) {
   const { body } = req;
 
   // create card
-  if (body.action.type === "createCard" && body.action.data.card.name.indexOf("https://") != 0) {
+  if (body.action && body.action.type === "createCard" && body.action.data.card.name.indexOf("https://") != 0) {
     Promise.all([
       joinCard(body.action.data.card.id, body.action.idMemberCreator)
     ])
@@ -27,6 +27,6 @@ export default function callback(req, res) {
         })
       });
   } else {
-    res.status(status).text();
+    res.status(204).send();
   }
 }

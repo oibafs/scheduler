@@ -24,8 +24,9 @@ export default function callback(req, res) {
             result: item.text,
           });
           status = item.status != 200 ? item.status : status;
-          res.status(status).json(ret);
-        })
+        });
+        console.log(ret);
+        res.status(status).json(ret);
       });
   } else {
     res.status(204).send();

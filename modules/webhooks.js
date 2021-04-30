@@ -34,7 +34,6 @@ export const fillCardId = async (card) => {
   let result = {};
 
   const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
-  console.log("getCardRes", getCardRes);
 
   if (getCardRes.status === 200) {
     const fieldCardId = getCardRes.text.customFields.filter(item => item.name === "cardId")[0].id;
@@ -46,11 +45,8 @@ export const fillCardId = async (card) => {
         }
       }
     };
-    console.log("params", params);
-    console.log(`https://api.trello.com/1/cards/${card.id}/customField/${fieldCardId}/item?`);
 
     const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldCardId}/item?`, "PUT", params);
-    console.log("putCustomFieldItemRes", putCustomFieldItemRes);
 
     result.status = putCustomFieldItemRes.status;
     if (putCustomFieldItemRes.status === 200) {

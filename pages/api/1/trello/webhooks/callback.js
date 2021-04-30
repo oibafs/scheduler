@@ -7,7 +7,6 @@ export default function callback(req, res) {
   let status = 200;
 
   const { body } = req;
-  console.log(body.action.type);
 
   // create card
   if (body.action && body.action.type === "createCard" && body.action.data.card.name.indexOf("https://") != 0) {
@@ -21,7 +20,6 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        console.log(status, ret);
         res.status(status).json(ret);
       });
 

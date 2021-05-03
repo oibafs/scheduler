@@ -58,3 +58,46 @@ export const fillCardId = async (card) => {
     return result;
   }
 }
+
+export const repeatCard = async (card) => {
+
+  const params = {
+    params: {
+      fields: "id",
+      customFields: true
+    }
+  };
+
+  let result = {};
+
+  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+
+  if (getCardRes.status === 200) {
+
+    let recurring;
+    if (getCardRes.text.customFields.filter) {
+      const fieldRecurring = getCardRes.text.customFields.filter(item => item.name === "Recurring");
+      if (fieldRecurring.length > 0) {
+        const fieldRecurringValue = getCardRes.text.customFieldItems.filter(item => item.id === fieldRecurring[0].id);
+        recurring = fieldRecurringValue.length > 0 ? fieldRecurringValue[0].value.number : undefined;
+      }
+    }
+
+    if (recurring) {
+      const repeatCardRes = await runQuery(`https://scheduler-ruby.vercel.app/api/1/trello/cards/${card.id}/repeat`, "POST", noAuth = true);
+
+      result.status = repeatCardRes.status;
+      if (repeatCardRes.status === 200) {
+        result.text = `Created a new instance for ${card.name} with id ${repeatCardRes.text.newCard}`;
+      } else {
+        result.text = `Error repeating card ${card.name}`;
+      }
+    } else {
+      result.status = 200;
+      result.text = `Card ${card.name} is not recurring`;
+    }
+
+    return result;
+  }
+
+}

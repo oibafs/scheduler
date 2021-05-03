@@ -1,4 +1,4 @@
-import { fillCardId, joinCard } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, repeatCard } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
@@ -26,7 +26,7 @@ export default function callback(req, res) {
     // mark due date complete
   } else if (body.action && body.action.type === "updateCard" && body.action.display.translationKey === "action_marked_the_due_date_complete") {
     Promise.all([
-
+      repeatCard(body.action.data.card)
     ])
       .then((response) => {
         response.map((item) => {

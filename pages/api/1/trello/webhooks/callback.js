@@ -7,6 +7,7 @@ export default function callback(req, res) {
   let status = 200;
 
   const { body } = req;
+  console.log(body);
 
   // create card
   if (body.action && body.action.type === "createCard" && body.action.data.card.name.indexOf("https://") != 0) {

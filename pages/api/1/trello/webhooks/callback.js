@@ -21,11 +21,25 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        res.status(status).json(ret);
+      });
+
+    // mark due date complete
+  } else if (body.action && body.action.type === "updateCard" && body.action.display.translationKey === "action_marked_the_due_date_complete") {
+    Promise.all([
+
+    ])
+      .then((response) => {
+        response.map((item) => {
+
+          ret.actions.push(item.text);
+          status = item.status != 200 ? item.status : status;
+        });
       });
 
     // no action
   } else {
     res.status(200).send();
   }
+  console.log(status, ret);
+  res.status(status).json(ret);
 }

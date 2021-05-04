@@ -64,15 +64,14 @@ export const repeatCard = async (card) => {
   const params = {
     params: {
       fields: "id",
-      customFields: true
+      customFields: true,
+      customFieldItems: true
     }
   };
 
   let result = {};
 
-  console.log("card.id", card.id);
   const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
-  console.log("getCardRes.status", getCardRes.status);
 
   if (getCardRes.status === 200) {
 
@@ -80,16 +79,17 @@ export const repeatCard = async (card) => {
     if (getCardRes.text.customFields.filter) {
       const fieldRecurring = getCardRes.text.customFields.filter(item => item.name === "Recurring");
       if (fieldRecurring.length > 0) {
-        const fieldRecurringValue = getCardRes.text.customFieldItems.filter(item => item.id === fieldRecurring[0].id);
+        const fieldRecurringValue = getCardRes.text.customFieldItems.filter(item => item.idCustomField === fieldRecurring[0].id);
         recurring = fieldRecurringValue.length > 0 ? fieldRecurringValue[0].value.number : undefined;
       }
     }
 
     if (recurring) {
-      const repeatCardRes = await runQuery(`https://scheduler-ruby.vercel.app/api/1/trello/cards/${card.id}/repeat`, "POST", noAuth = true);
+      const repeatCardRes = await runQuery(`https://scheduler-ruby.vercel.app/api/1/trello/cards/${card.id}/repeat`, "POST", undefined, undefined, true);
 
       result.status = repeatCardRes.status;
-      if (repeatCardRes.status === 200) {
+      if (repeatCardRes.status === 201) {
+        result.status = 200;
         result.text = `Created a new instance for ${card.name} with id ${repeatCardRes.text.newCard}`;
       } else {
         result.text = `Error repeating card ${card.name}`;

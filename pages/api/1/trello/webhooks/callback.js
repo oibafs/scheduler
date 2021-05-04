@@ -8,15 +8,13 @@ export default function callback(req, res) {
 
   const { body, method } = req;
   console.log("method", method);
-  console.log(body);
+  console.log("body", body);
 
   if (method === "HEAD") {
     res.status(200).send();
     return;
   }
 
-  console.log("body.action.type", body.action.type);
-  console.log("body.action.display.translationKey", body.action.display.translationKey);
   // create card
   if (body.action && body.action.type === "createCard" && body.action.data.card.name.indexOf("https://") != 0) {
     Promise.all([
@@ -29,6 +27,12 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
+        console.log(status, ret);
+        res.status(status).json(ret);
+      })
+      .catch((error) => {
+        console.log("error", error);
+        res.status(500).send();
       });
 
     // mark due date complete
@@ -42,13 +46,18 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
+        console.log(status, ret);
+        res.status(status).json(ret);
+      })
+      .catch((error) => {
+        console.log("error", error);
+        res.status(500).send();
       });
 
     // no action
   } else {
+    console.log(status);
     res.status(200).send();
     return;
   }
-  console.log(status, ret);
-  res.status(status).json(ret);
 }

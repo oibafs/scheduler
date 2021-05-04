@@ -41,7 +41,7 @@ export default async function repeat(req, res) {
 
     if (cardRes.status === 200) {
       const cardJson = cardRes.text;
-      const idList = lists[cardJson.idList];
+      const idList = lists[cardJson.idList] ? lists[cardJson.idList] : cardJson.idList;
       const customFields = getCustomFields(cardJson);
       let recurring = customFields.Recurring ? parseInt(customFields.Recurring) : 0;
       const recPeriod = customFields["Recurring period"] ? customFields["Recurring period"] : "days";

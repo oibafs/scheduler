@@ -12,6 +12,7 @@ export default function callback(req, res) {
 
   if (method === "HEAD") {
     res.status(200).send();
+    return;
   }
 
   console.log("body.action.type", body.action.type);
@@ -46,6 +47,7 @@ export default function callback(req, res) {
     // no action
   } else {
     res.status(200).send();
+    return;
   }
   console.log(status, ret);
   res.status(status).json(ret);

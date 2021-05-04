@@ -70,7 +70,9 @@ export const repeatCard = async (card) => {
 
   let result = {};
 
+  console.log("card.id", card.id);
   const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+  console.log("getCardRes", getCardRes);
 
   if (getCardRes.status === 200) {
 

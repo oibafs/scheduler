@@ -6,8 +6,13 @@ export default function callback(req, res) {
   };
   let status = 200;
 
-  const { body } = req;
+  const { body, method } = req;
+  console.log("method", method);
   console.log(body);
+
+  if (method === "HEAD") {
+    res.status(200).send();
+  }
 
   console.log("body.action.type", body.action.type);
   console.log("body.action.display.translationKey", body.action.display.translationKey);

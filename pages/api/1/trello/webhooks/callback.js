@@ -9,6 +9,8 @@ export default function callback(req, res) {
   const { body } = req;
   console.log(body);
 
+  console.log("body.action.type", body.action.type);
+  console.log("body.action.display.translationKey", body.action.display.translationKey);
   // create card
   if (body.action && body.action.type === "createCard" && body.action.data.card.name.indexOf("https://") != 0) {
     Promise.all([

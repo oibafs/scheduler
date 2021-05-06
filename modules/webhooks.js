@@ -131,7 +131,8 @@ export const moveToDone = async (data) => {
 
         const params = {
           params: {
-            idList: doneListId
+            idList: doneListId,
+            pos: "top"
           }
         };
 

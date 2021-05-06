@@ -103,3 +103,7 @@ export const repeatCard = async (card) => {
   }
 
 }
+
+export const moveToDone = async (card) => {
+
+}

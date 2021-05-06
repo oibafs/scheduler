@@ -9,7 +9,6 @@ export default function callback(req, res) {
   const { body, method } = req;
   console.log("method", method);
   console.log("body", body);
-  console.log("body.action.data.card", body.action.data);
 
   if (method === "HEAD") {
     res.status(200).send();

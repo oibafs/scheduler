@@ -114,6 +114,7 @@ export const moveToDone = async (data) => {
 
   let result = {};
 
+  console.log("data.board", data.board);
   const getBoardRes = await runQuery(`https://api.trello.com/1/boards/${data.board.id}/lists?`, "GET", params);
 
   if (getBoardRes.status === 200) {
@@ -122,6 +123,7 @@ export const moveToDone = async (data) => {
     try {
       const doneList = getBoardRes.text.filter(item => item.name === "Done");
       if (doneList.length > 0) {
+        console.log("doneList", doneList);
         doneListId = doneList[0].id;
       }
 
@@ -133,6 +135,7 @@ export const moveToDone = async (data) => {
           }
         };
 
+        console.log("data.card", data.card);
         const moveToDoneRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}?`, "PUT", params);
 
         result.status = moveToDoneRes.status;

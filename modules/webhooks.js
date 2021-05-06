@@ -104,6 +104,55 @@ export const repeatCard = async (card) => {
 
 }
 
-export const moveToDone = async (card) => {
+export const moveToDone = async (data) => {
 
+  const params = {
+    params: {
+      fields: "id,name"
+    }
+  };
+
+  let result = {};
+
+  const getBoardRes = await runQuery(`https://api.trello.com/1/boards/${data.board.id}/lists?`, "GET", params);
+
+  if (getBoardRes.status === 200) {
+
+    let doneListId;
+    try {
+      const doneList = getBoardRes.text.filter(item => item.name === "Done");
+      if (doneList.length > 0) {
+        doneListId = doneList[0].id;
+      }
+
+      if (doneListId) {
+
+        const params = {
+          params: {
+            idList: doneListId
+          }
+        };
+
+        const moveToDoneRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}?`, "PUT", params);
+
+        result.status = moveToDoneRes.status;
+        if (moveToDoneRes.status === 200) {
+          result.text = `Moved ${data.card.name} to Done`;
+        } else {
+          result.text = `Error moving card ${data.card.name} to Done`;
+        }
+      } else {
+        result.status = 200;
+        result.text = `Board ${data.board.name} does not seem to have a list Done`;
+      }
+
+    } catch (error) {
+      result.status = 200;
+      result.text = `Board ${data.board.name} does not seem to have a list Done`;
+    }
+  } else {
+    result.status = getBoardRes.status;
+    result.text = `Error getting information from board ${data.board.name}`;
+  }
+  return result;
 }

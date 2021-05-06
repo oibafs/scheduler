@@ -20,7 +20,7 @@ export default function callback(req, res) {
   if (body.action && body.action.type === "createCard" && body.action.data.card.name.indexOf("https://") != 0) {
     Promise.all([
       joinCard(body.action.data.card, body.action.idMemberCreator),
-      fillCardId(body.action.data.card)
+      fillCardId(body.action.data)
     ])
       .then((response) => {
         response.map((item) => {

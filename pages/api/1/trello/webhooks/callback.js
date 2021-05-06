@@ -19,7 +19,7 @@ export default function callback(req, res) {
   if (body.action && body.action.type === "createCard" && body.action.data.card.name.indexOf("https://") != 0) {
     Promise.all([
       joinCard(body.action.data.card, body.action.idMemberCreator),
-      fillCardId(body.action.data)
+      fillCardId(body.action.data.card)
     ])
       .then((response) => {
         response.map((item) => {
@@ -39,7 +39,7 @@ export default function callback(req, res) {
   } else if (body.action && body.action.type === "updateCard" && body.action.display.translationKey === "action_marked_the_due_date_complete") {
     Promise.all([
       repeatCard(body.action.data.card),
-      moveToDone(body.action.data.card)
+      moveToDone(body.action.data)
     ])
       .then((response) => {
         response.map((item) => {

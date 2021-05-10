@@ -212,7 +212,7 @@ export const setDateConcluded = async (card) => {
   }
 }
 
-export const setStatusToDone = async (card) => {
+export const setStatusDone = async (card) => {
 
   const params = {
     params: {
@@ -224,11 +224,13 @@ export const setStatusToDone = async (card) => {
   let result = {};
 
   const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+  console.log("getCardRes", getCardRes);
 
   if (getCardRes.status === 200) {
     const status = getCardRes.text.customFields.filter(item => item.name === "Status")[0];
     const fieldStatus = status.id;
     const valueDone = status.options.filter(item => item.value.text === "Done")[0].id;
+    console.log("status", status, "fieldStatus", fieldStatus, "valueDone", valueDone);
 
     const params = {
       body: {

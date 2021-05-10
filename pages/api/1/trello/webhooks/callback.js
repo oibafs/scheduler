@@ -59,7 +59,7 @@ export default function callback(req, res) {
     // move card to Done
   } else if (body.action && body.action.type === "updateCard" && body.action.display.translationKey === "action_move_card_from_list_to_list" && body.action.data.listAfter.name === "Done" && body.action.data.card.name.indexOf("https://") != 0) {
     Promise.all([
-      leaveCard(body.action.data.card, body.action.idMemberCreator)
+      leaveCard(body.action.data.card, body.action.memberCreator)
     ])
       .then((response) => {
         response.map((item) => {

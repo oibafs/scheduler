@@ -162,11 +162,11 @@ export const leaveCard = async (card, member) => {
 
   let result = {};
 
-  const cardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/idMembers/${member}?`, "DELETE");
+  const cardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/idMembers/${member.id}?`, "DELETE");
 
   result.status = cardRes.status;
   if (cardRes.status === 200) {
-    result.text = `${cardRes.text[0].fullName} left ${card.name}`;
+    result.text = `${member.fullName} left ${card.name}`;
   } else {
     result.text = `Error leaving ${card.name}`;
   }

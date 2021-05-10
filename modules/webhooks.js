@@ -325,7 +325,7 @@ export const setImportanceZero = async (card) => {
       }
     };
 
-    const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldDateConcluded}/item?`, "PUT", params);
+    const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldImportance}/item?`, "PUT", params);
 
     result.status = putCustomFieldItemRes.status;
     if (putCustomFieldItemRes.status === 200) {

@@ -224,7 +224,6 @@ export const setStatusDone = async (card) => {
   let result = {};
 
   const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
-  console.log("getCardRes", getCardRes);
 
   if (getCardRes.status === 200) {
     const status = getCardRes.text.customFields.filter(item => item.name === "Status")[0];
@@ -241,6 +240,7 @@ export const setStatusDone = async (card) => {
     };
 
     const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldStatus}/item?`, "PUT", params);
+    console.log("putCustomFieldItemRes", putCustomFieldItemRes);
 
     result.status = putCustomFieldItemRes.status;
     if (putCustomFieldItemRes.status === 200) {

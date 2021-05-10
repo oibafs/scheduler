@@ -233,9 +233,7 @@ export const setStatusDone = async (card) => {
 
     const params = {
       body: {
-        value: {
-          idValue: valueDone
-        }
+        idValue: valueDone
       }
     };
 

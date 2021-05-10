@@ -173,3 +173,41 @@ export const leaveCard = async (card, member) => {
 
   return result;
 }
+
+export const setDateConcluded = async (card) => {
+
+  const params = {
+    params: {
+      fields: "id",
+      customFields: true
+    }
+  };
+
+  let result = {};
+
+  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+
+  if (getCardRes.status === 200) {
+    const fieldDateConcluded = getCardRes.text.customFields.filter(item => item.name === "Date concluded")[0].id;
+    const dateConcluded = new Date();
+
+    const params = {
+      body: {
+        value: {
+          date: dateConcluded
+        }
+      }
+    };
+
+    const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldDateConcluded}/item?`, "PUT", params);
+
+    result.status = putCustomFieldItemRes.status;
+    if (putCustomFieldItemRes.status === 200) {
+      result.text = `Updated the value for the Date concluded custom field on ${card.name} to ${dateConcluded}`;
+    } else {
+      result.text = `Error updating the value for the Date concluded custom field on ${card.name}`;
+    }
+
+    return result;
+  }
+}

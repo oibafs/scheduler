@@ -59,10 +59,10 @@ export default function callback(req, res) {
     // move card to Done
   } else if (body.action && body.action.type === "updateCard" && body.action.display.translationKey === "action_move_card_from_list_to_list" && body.action.data.listAfter.name === "Done" && body.action.data.card.name.indexOf("https://") != 0) {
     Promise.all([
-      // leaveCard(body.action.data.card, body.action.memberCreator),
-      // setDateConcluded(body.action.data.card),
-      // setStatusDone(body.action.data.card),
-      // removeTodayLabel(body.action.data.card),
+      leaveCard(body.action.data.card, body.action.memberCreator),
+      setDateConcluded(body.action.data.card),
+      setStatusDone(body.action.data.card),
+      removeTodayLabel(body.action.data.card),
       setImportanceZero(body.action.data.card)
     ])
       .then((response) => {

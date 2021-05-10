@@ -1,4 +1,4 @@
-import { fillCardId, joinCard, moveToDone, repeatCard, leaveCard, setDateConcluded, setStatusDone, removeTodayLabel } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToDone, repeatCard, leaveCard, setDateConcluded, setStatusDone, removeTodayLabel, setImportanceZero } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
@@ -62,7 +62,8 @@ export default function callback(req, res) {
       leaveCard(body.action.data.card, body.action.memberCreator),
       setDateConcluded(body.action.data.card),
       setStatusDone(body.action.data.card),
-      removeTodayLabel(body.action.data.card)
+      removeTodayLabel(body.action.data.card),
+      setImportanceZero(body.action.data.card)
     ])
       .then((response) => {
         response.map((item) => {

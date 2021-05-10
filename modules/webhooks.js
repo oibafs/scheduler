@@ -300,3 +300,42 @@ export const removeTodayLabel = async (card) => {
   }
   return result;
 }
+
+export const setImportanceZero = async (card) => {
+
+  const params = {
+    params: {
+      fields: "id",
+      customFields: true
+    }
+  };
+
+  let result = {};
+
+  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+
+  if (getCardRes.status === 200) {
+    const fieldImportance = getCardRes.text.customFields.filter(item => item.name === "Importance")[0].id;
+
+    const params = {
+      body: {
+        value: {
+          number: 0
+        }
+      }
+    };
+
+    const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldDateConcluded}/item?`, "PUT", params);
+
+    result.status = putCustomFieldItemRes.status;
+    if (putCustomFieldItemRes.status === 200) {
+      result.text = `Updated the value for the Importance custom field on ${card.name} to 0`;
+    } else {
+      result.text = `Error updating the value for the Importance custom field on ${card.name}`;
+    }
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
+  }
+  return result;
+}

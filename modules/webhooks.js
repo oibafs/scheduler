@@ -325,6 +325,7 @@ export const setImportanceZero = async (card) => {
         }
       }
     };
+    console.log("body", JSON.stringify(params.body));
 
     const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldImportance}/item?`, "PUT", params);
     console.log("putCustomFieldItemRes", putCustomFieldItemRes);

@@ -54,9 +54,11 @@ export const fillCardId = async (card) => {
     } else {
       result.text = `Error updating the value for the cardId custom field on ${card.name}`;
     }
-
-    return result;
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
   }
+  return result;
 }
 
 export const repeatCard = async (card) => {
@@ -98,10 +100,11 @@ export const repeatCard = async (card) => {
       result.status = 200;
       result.text = `Card ${card.name} is not recurring`;
     }
-
-    return result;
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
   }
-
+  return result;
 }
 
 export const moveToDone = async (data) => {
@@ -207,9 +210,11 @@ export const setDateConcluded = async (card) => {
     } else {
       result.text = `Error updating the value for the Date concluded custom field on ${card.name}`;
     }
-
-    return result;
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
   }
+  return result;
 }
 
 export const setStatusDone = async (card) => {
@@ -229,7 +234,6 @@ export const setStatusDone = async (card) => {
     const status = getCardRes.text.customFields.filter(item => item.name === "Status")[0];
     const fieldStatus = status.id;
     const valueDone = status.options.filter(item => item.value.text === "Done")[0].id;
-    console.log("status", status, "fieldStatus", fieldStatus, "valueDone", valueDone);
 
     const params = {
       body: {
@@ -238,7 +242,6 @@ export const setStatusDone = async (card) => {
     };
 
     const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldStatus}/item?`, "PUT", params);
-    console.log("putCustomFieldItemRes", putCustomFieldItemRes);
 
     result.status = putCustomFieldItemRes.status;
     if (putCustomFieldItemRes.status === 200) {
@@ -246,7 +249,54 @@ export const setStatusDone = async (card) => {
     } else {
       result.text = `Error updating the value for the Status custom field on ${card.name}`;
     }
-
-    return result;
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
   }
+  return result;
+}
+
+export const removeTodayLabel = async (card) => {
+
+  const params = {
+    params: {
+      fields: "id,labels"
+    }
+  };
+
+  let result = {};
+
+  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+
+  if (getCardRes.status === 200) {
+
+    let labelTodayId;
+    try {
+      const labelToday = getCardRes.text.labels.filter(item => item.name === "today");
+      if (labelToday.length > 0) {
+        labelTodayId = labelToday[0].id;
+      }
+
+      if (labelTodayId) {
+        const deleteLabelRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/idLabels/${labelTodayId}?`, "DELETE");
+
+        result.status = deleteLabelRes.status;
+        if (deleteLabelRes.status === 200) {
+          result.text = `Deleted the label today from card ${card.name}`;
+        } else {
+          result.text = `Error deleting the label today from card ${card.name}`;
+        }
+      } else {
+        result.status = 200;
+        result.text = `Card ${card.name} does not seem to have a label Today`;
+      }
+    } catch (error) {
+      result.status = 200;
+      result.text = `Card ${card.name} does not seem to have a label Today`;
+    }
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
+  }
+  return result;
 }

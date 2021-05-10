@@ -321,7 +321,7 @@ export const setImportanceZero = async (card) => {
     const params = {
       body: {
         value: {
-          number: 0
+          number: "0"
         }
       }
     };

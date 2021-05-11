@@ -1,4 +1,4 @@
-import { fillCardId, joinCard, moveToDone, repeatCard, leaveCard, setDateConcluded, setStatusDone, removeTodayLabel, setImportanceZero } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToDone, repeatCard, leaveCard, setDateConcluded, setStatusDone, removeTodayLabel, setImportanceZero, setStatus } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
@@ -61,7 +61,7 @@ export default function callback(req, res) {
     Promise.all([
       leaveCard(body.action.data.card, body.action.memberCreator),
       setDateConcluded(body.action.data.card),
-      setStatusDone(body.action.data.card),
+      setStatus(body.action.data.card, "Done"),
       removeTodayLabel(body.action.data.card),
       setImportanceZero(body.action.data.card)
     ])

@@ -217,45 +217,6 @@ export const setDateConcluded = async (card) => {
   return result;
 }
 
-export const setStatusDone = async (card) => {
-
-  const params = {
-    params: {
-      fields: "id",
-      customFields: true
-    }
-  };
-
-  let result = {};
-
-  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
-
-  if (getCardRes.status === 200) {
-    const status = getCardRes.text.customFields.filter(item => item.name === "Status")[0];
-    const fieldStatus = status.id;
-    const valueDone = status.options.filter(item => item.value.text === "Done")[0].id;
-
-    const params = {
-      body: {
-        idValue: valueDone
-      }
-    };
-
-    const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldStatus}/item?`, "PUT", params);
-
-    result.status = putCustomFieldItemRes.status;
-    if (putCustomFieldItemRes.status === 200) {
-      result.text = `Updated the value for the Status custom field on ${card.name} to Done`;
-    } else {
-      result.text = `Error updating the value for the Status custom field on ${card.name}`;
-    }
-  } else {
-    result.status = getCardRes.status;
-    result.text = `Error getting information from card ${card.name}`;
-  }
-  return result;
-}
-
 export const setStatus = async (card, toStatus) => {
 
   const params = {
@@ -371,6 +332,39 @@ export const setImportanceZero = async (card) => {
       result.text = `Updated the value for the Importance custom field on ${card.name} to 0`;
     } else {
       result.text = `Error updating the value for the Importance custom field on ${card.name}`;
+    }
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
+  }
+  return result;
+}
+
+export const setStatusToList = async (card) => {
+
+  const params = {
+    params: {
+      fields: "id",
+      customFields: true,
+      list: true
+    }
+  };
+
+  let result = {};
+
+  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+
+  if (getCardRes.status === 200) {
+    const listName = getCardRes.text.list.name;
+    const status = getCardRes.text.customFields.filter(item => item.name === "Status")[0];
+    const value = status.options.filter(item => item.value.text === listName);
+    const valueId = value.length > 0 ? value[0].id : undefined;
+
+    if (valueId) {
+      result = await setStatus(card, listName);
+    } else {
+      result.status = 200;
+      result.text = `Status of card ${card.name} matches with list ${listName}`;
     }
   } else {
     result.status = getCardRes.status;

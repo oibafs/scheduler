@@ -1,8 +1,8 @@
 import { runQuery, getCustomFields, getCheckListItems, addDays, daysUntilRepeat, dateDiff } from '../../../../../../modules/common.js';
 
 export default async function repeat(req, res) {
-  const startHours = 8;
-  const endHours = 20;
+  const startHours = 11;
+  const endHours = 21;
   const { card } = req.query;
 
   const lists = {
@@ -83,6 +83,7 @@ export default async function repeat(req, res) {
             putJson.checkListItems = [];
             for (let i = 0; i < checkLists.length; i++) {
               let checkListDue = new Date(checkLists[i].due);
+              recurring = daysUntilRepeat(checkListDue, recurring, recPeriod);
               checkLists[i].due = (recPeriod === "days") ? addDays(checkListDue, recurring, actionDays, checkListDue) : new Date(checkListDue.setUTCDate(checkListDue.getUTCDate() + recurring));
               earliestDate = (checkLists[i].due < earliestDate || !earliestDate) ? new Date(checkLists[i].due) : earliestDate;
               putJson.checkListItems.push({
@@ -102,8 +103,8 @@ export default async function repeat(req, res) {
               if (!cardJson.due) {
                 due.setHours(endHours, 0, 0, 0);
               }
+              recurring = daysUntilRepeat(due, recurring, recPeriod);
             }
-            recurring = daysUntilRepeat(due, recurring, recPeriod);
 
             // Start date
             let start = new Date(due);
@@ -111,10 +112,14 @@ export default async function repeat(req, res) {
             if (cardJson.start) {
               start = new Date(cardJson.start);
             }
-            start = (recPeriod === "days") ? addDays(start, recurring, actionDays, start) : new Date(start.setUTCDate(start.getUTCDate() + recurring));
 
-            // Due date
-            due = (recPeriod === "days") ? addDays(due, recurring, actionDays, due) : new Date(due.setUTCDate(due.getUTCDate() + recurring));
+            // Do not advance date if it comes from checklist, because it has already advanced
+            if (!earliestDate || cardJson.start) {
+              start = (recPeriod === "days") ? addDays(start, recurring, actionDays, start) : new Date(start.setUTCDate(start.getUTCDate() + recurring));
+            }
+            if (!earliestDate) {
+              due = (recPeriod === "days") ? addDays(due, recurring, actionDays, due) : new Date(due.setUTCDate(due.getUTCDate() + recurring));
+            }
 
             putJson.main = {
               params: {

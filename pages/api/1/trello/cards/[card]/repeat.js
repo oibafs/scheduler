@@ -1,13 +1,9 @@
-import next from 'next';
 import { runQuery, getCustomFields, getCheckListItems, addDays, daysUntilRepeat, dateDiff } from '../../../../../../modules/common.js';
 
 export default async function repeat(req, res) {
-  const key = process.env.TRELLOKEY;
-  const token = process.env.TRELLOTOKEN;
   const startHours = 8;
   const endHours = 20;
   const { card } = req.query;
-  const { body } = req;
 
   const lists = {
     //Gestão Atividades(Time)
@@ -47,7 +43,6 @@ export default async function repeat(req, res) {
       const recPeriod = customFields["Recurring period"] ? customFields["Recurring period"] : "days";
       const actionDays = customFields["Action days"] ? customFields["Action days"] : "Any day";
 
-      console.log(customFields);
       if (recurring != 0) {
 
         // Copy card
@@ -83,21 +78,39 @@ export default async function repeat(req, res) {
             // Change fields
             let putJson = {};
 
-            // Start date
-            let due = cardJson.due ? new Date(cardJson.due) : new Date();
-            recurring = daysUntilRepeat(due, recurring, recPeriod);
-
-            if (!cardJson.due) {
-              due.setHours(endHours, 0, 0, 0);
+            // Checklist items
+            let earliestDate;
+            putJson.checkListItems = [];
+            for (let i = 0; i < checkLists.length; i++) {
+              let checkListDue = new Date(checkLists[i].due);
+              checkLists[i].due = (recPeriod === "days") ? addDays(checkListDue, recurring, actionDays, checkListDue) : new Date(checkListDue.setUTCDate(checkListDue.getUTCDate() + recurring));
+              earliestDate = (checkLists[i].due < earliestDate || !earliestDate) ? new Date(checkLists[i].due) : earliestDate;
+              putJson.checkListItems.push({
+                id: checkLists[i].id,
+                params: {
+                  due: JSON.parse(JSON.stringify(checkLists[i].due))
+                }
+              })
             }
 
+            // Due date
+            let due;
+            if (earliestDate) { // first checklist item date
+              due = earliestDate;
+            } else {
+              due = cardJson.due ? new Date(cardJson.due) : new Date();
+              if (!cardJson.due) {
+                due.setHours(endHours, 0, 0, 0);
+              }
+            }
+            recurring = daysUntilRepeat(due, recurring, recPeriod);
+
+            // Start date
             let start = new Date(due);
             start.setHours(startHours, 0, 0, 0);
-
             if (cardJson.start) {
               start = new Date(cardJson.start);
             }
-
             start = (recPeriod === "days") ? addDays(start, recurring, actionDays, start) : new Date(start.setUTCDate(start.getUTCDate() + recurring));
 
             // Due date
@@ -126,7 +139,6 @@ export default async function repeat(req, res) {
 
             // Start date (Custom fields)
             customFields["Start date"] = new Date(start);
-
             putJson.customFields.push({
               idCustomField: customFields["idCustomFieldStart date"],
               body: {
@@ -136,47 +148,23 @@ export default async function repeat(req, res) {
               }
             });
 
-            // Checklist items
-            let earliestDate;
-            putJson.checkListItems = [];
-
-            for (let i = 0; i < checkLists.length; i++) {
-              let checkListDue = new Date(checkLists[i].due);
-              checkLists[i].due = (recPeriod === "days") ? addDays(checkListDue, recurring, actionDays, checkListDue) : new Date(checkListDue.setUTCDate(checkListDue.getUTCDate() + recurring));
-              earliestDate = (checkLists[i].due < earliestDate || !earliestDate) ? new Date(checkLists[i].due) : earliestDate;
-
-              putJson.checkListItems.push({
-                id: checkLists[i].id,
-                params: {
-                  due: JSON.parse(JSON.stringify(checkLists[i].due))
-                }
-              })
-
-            }
-
             // Next action
-            if (earliestDate) { // first checklist item date
-              customFields["Next action"] = earliestDate;
-            } else if (customFields["Next action"]) { // card has next action date
-              let nextAction = new Date(customFields["Next action"]);
+            if (customFields["Deadline"]) { // card has next action date
+              let nextAction = new Date(customFields["Deadline"]);
               nextAction = (recPeriod === "days") ? addDays(nextAction, recurring, actionDays, nextAction) : new Date(nextAction.setUTCDate(nextAction.getUTCDate() + recurring));
-              customFields["Next action"] = new Date(nextAction);
-            } else {
-              customFields["Next action"] = start;
-            }
-
-            putJson.customFields.push({
-              idCustomField: customFields["idCustomFieldNext action"],
-              body: {
-                value: {
-                  date: JSON.parse(JSON.stringify(customFields["Next action"]))
+              customFields["Deadline"] = new Date(nextAction);
+              putJson.customFields.push({
+                idCustomField: customFields["idCustomDeadline"],
+                body: {
+                  value: {
+                    date: JSON.parse(JSON.stringify(customFields["Deadline"]))
+                  }
                 }
-              }
-            });
+              });
+            }
 
             // Date concluded
             customFields["Date concluded"] = null;
-
             putJson.customFields.push({
               idCustomField: customFields["idCustomFieldDate concluded"],
               body: {

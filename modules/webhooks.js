@@ -87,7 +87,8 @@ export const repeatCard = async (card) => {
     }
 
     if (recurring) {
-      const repeatCardRes = await runQuery(`https://scheduler-ruby.vercel.app/api/1/trello/cards/${card.id}/repeat`, "POST", undefined, undefined, true);
+      // const repeatCardRes = await runQuery(`https://scheduler-ruby.vercel.app/api/1/trello/cards/${card.id}/repeat`, "POST", undefined, undefined, true);
+      const repeatCardRes = await runQuery(`https://scheduler-git-new-webhook-oibafs.vercel.app/api/1/trello/cards/${card.id}/repeat`, "POST", undefined, undefined, true);
 
       result.status = repeatCardRes.status;
       if (repeatCardRes.status === 201) {

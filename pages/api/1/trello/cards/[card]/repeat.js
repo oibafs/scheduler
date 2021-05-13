@@ -154,15 +154,15 @@ export default async function repeat(req, res) {
             });
 
             // Next action
-            if (customFields["Deadline"]) { // card has next action date
-              let nextAction = new Date(customFields["Deadline"]);
+            if (customFields.Deadline) { // card has next action date
+              let nextAction = new Date(customFields.Deadline);
               nextAction = (recPeriod === "days") ? addDays(nextAction, recurring, actionDays, nextAction) : new Date(nextAction.setUTCDate(nextAction.getUTCDate() + recurring));
-              customFields["Deadline"] = new Date(nextAction);
+              customFields.Deadline = new Date(nextAction);
               putJson.customFields.push({
-                idCustomField: customFields["idCustomDeadline"],
+                idCustomField: customFields.idCustomFieldDeadline,
                 body: {
                   value: {
-                    date: JSON.parse(JSON.stringify(customFields["Deadline"]))
+                    date: JSON.parse(JSON.stringify(customFields.Deadline))
                   }
                 }
               });

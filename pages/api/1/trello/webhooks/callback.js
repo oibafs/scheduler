@@ -1,4 +1,4 @@
-import { fillCardId, joinCard, moveToDone, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToDone, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
@@ -41,7 +41,7 @@ export default function callback(req, res) {
   } else if (body.action && body.action.type === "updateCard" && body.action.display.translationKey === "action_marked_the_due_date_complete") {
     Promise.all([
       repeatCard(body.action.data.card),
-      moveToDone(body.action.data)
+      moveToList(body.action.data, "Done")
     ])
       .then((response) => {
         response.map((item) => {
@@ -85,7 +85,22 @@ export default function callback(req, res) {
     setStatusToList(body.action.data.card)
       .then((response) => {
         response.map((item) => {
+          ret.actions.push(item.text);
+          status = item.status != 200 ? item.status : status;
+        });
+        console.log(status, ret);
+        res.status(status).json(ret);
+      })
+      .catch((error) => {
+        console.log("error", error);
+        res.status(500).send();
+      });
 
+    // change status
+  } else if (body.action && body.action.type === "updateCustomFieldItem" && body.action.data.customField.name === "Status") {
+    moveToListAsStatus(body.action.data)
+      .then((response) => {
+        response.map((item) => {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });

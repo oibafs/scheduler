@@ -108,7 +108,7 @@ export const repeatCard = async (card) => {
   return result;
 }
 
-export const moveToDone = async (data) => {
+export const moveToList = async (data, list) => {
 
   const params = {
     params: {
@@ -122,38 +122,38 @@ export const moveToDone = async (data) => {
 
   if (getBoardRes.status === 200) {
 
-    let doneListId;
+    let toListId;
     try {
-      const doneList = getBoardRes.text.filter(item => item.name === "Done");
-      if (doneList.length > 0) {
-        doneListId = doneList[0].id;
+      const toList = getBoardRes.text.filter(item => item.name === list);
+      if (toList.length > 0) {
+        toListId = toList[0].id;
       }
 
-      if (doneListId) {
+      if (toListId) {
 
         const params = {
           params: {
-            idList: doneListId,
+            idList: toListId,
             pos: "top"
           }
         };
 
-        const moveToDoneRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}?`, "PUT", params);
+        const moveToListRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}?`, "PUT", params);
 
-        result.status = moveToDoneRes.status;
-        if (moveToDoneRes.status === 200) {
+        result.status = moveToListRes.status;
+        if (moveToListRes.status === 200) {
           result.text = `Moved ${data.card.name} to Done`;
         } else {
           result.text = `Error moving card ${data.card.name} to Done`;
         }
       } else {
         result.status = 200;
-        result.text = `Board ${data.board.name} does not seem to have a list Done`;
+        result.text = `Board ${data.board.name} does not seem to have a list ${list}`;
       }
 
     } catch (error) {
       result.status = 200;
-      result.text = `Board ${data.board.name} does not seem to have a list Done`;
+      result.text = `Board ${data.board.name} does not seem to have a list ${list}`;
     }
   } else {
     result.status = getBoardRes.status;
@@ -366,6 +366,48 @@ export const setStatusToList = async (card) => {
     } else {
       result.status = 200;
       result.text = `Status of card ${card.name} matches with list ${listName}`;
+    }
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
+  }
+  return result;
+}
+
+export const moveToListAsStatus = async (data) => {
+
+  const params = {
+    params: {
+      fields: "id",
+      customFields: true,
+      list: true
+    }
+  };
+
+  let result = {};
+
+  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}?`, "GET", params);
+
+  if (getCardRes.status === 200) {
+    const customFieldStatus = getCardRes.text.customFields.filter(item => item.id === data.customField.id);
+    if (customFieldStatus.length > 0 && customFieldStatus[0].options.filter) {
+      const statusValue = customFieldStatus[0].options.filter(item => item.id === data.customFieldItem.idValue);
+      const status = statusValue.length > 0 ? statusValue[0].value.text : undefined;
+      if (status) {
+        const listName = getCardRes.text.list.name;
+        if (listName != status) {
+          result = await moveToList(data.card, listName);
+        } else {
+          result.status = 200;
+          result.text = `The list the card ${card.name} is on matches with status ${status}`;
+        }
+      } else {
+        result.status = 200;
+        result.text = `Could not determine status of card ${card.name}`;
+      }
+    } else {
+      result.status = 200;
+      result.text = `Could not determine status of card ${card.name}`;
     }
   } else {
     result.status = getCardRes.status;

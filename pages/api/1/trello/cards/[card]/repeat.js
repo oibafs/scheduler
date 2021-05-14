@@ -108,14 +108,10 @@ export default async function repeat(req, res) {
 
             // Start date
             let start = new Date(due);
-            console.log("start", start);
             start.setHours(startHours, 0, 0, 0);
-            console.log("start", start);
             if (cardJson.start) {
               start = new Date(cardJson.start);
             }
-            console.log("start", start);
-            console.log("cardJson.start", cardJson.start);
 
             // Do not advance date if it comes from checklist, because it has already advanced
             if (!earliestDate || cardJson.start) {
@@ -187,7 +183,6 @@ export default async function repeat(req, res) {
               // Change custom fields of new card
               let changeCFRes;
 
-              console.log(putJson.customFields);
               for (let i = 0; i < putJson.customFields.length; i++) {
                 const changeCustomFieldRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/customField/${putJson.customFields[i].idCustomField}/item?`, "PUT", putJson.customFields[i]);
                 changeCFRes = changeCustomFieldRes;

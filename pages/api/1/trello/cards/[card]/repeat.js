@@ -108,10 +108,14 @@ export default async function repeat(req, res) {
 
             // Start date
             let start = new Date(due);
+            console.log("start", start);
             start.setHours(startHours, 0, 0, 0);
+            console.log("start", start);
             if (cardJson.start) {
               start = new Date(cardJson.start);
             }
+            console.log("start", start);
+            console.log("cardJson.start", cardJson.start);
 
             // Do not advance date if it comes from checklist, because it has already advanced
             if (!earliestDate || cardJson.start) {
@@ -132,15 +136,13 @@ export default async function repeat(req, res) {
             putJson.customFields = [];
 
             // Status
-            // Commented out because Butler is setting status according to the list the card is created in
-            /*             customFields.Status = "To do";
-            
-                        putJson.customFields.push({
-                          idCustomField : customFields.idCustomFieldStatus,
-                          body : {
-                              idValue : JSON.parse(JSON.stringify(customFields["idCustomFieldValueStatusTo do"]))
-                          }
-                        }); */
+            customFields.Status = "To do";
+            putJson.customFields.push({
+              idCustomField: customFields.idCustomFieldStatus,
+              body: {
+                idValue: JSON.parse(JSON.stringify(customFields["idCustomFieldValueStatusTo do"]))
+              }
+            });
 
             // Start date (Custom fields)
             customFields["Start date"] = new Date(start);

@@ -142,9 +142,9 @@ export const moveToList = async (data, list) => {
 
         result.status = moveToListRes.status;
         if (moveToListRes.status === 200) {
-          result.text = `Moved ${data.card.name} to Done`;
+          result.text = `Moved ${data.card.name} to ${list}`;
         } else {
-          result.text = `Error moving card ${data.card.name} to Done`;
+          result.text = `Error moving card ${data.card.name} to ${list}`;
         }
       } else {
         result.status = 200;
@@ -396,22 +396,22 @@ export const moveToListAsStatus = async (data) => {
       if (status) {
         const listName = getCardRes.text.list.name;
         if (listName != status) {
-          result = await moveToList(data.card, listName);
+          result = await moveToList(data, listName);
         } else {
           result.status = 200;
-          result.text = `The list the card ${card.name} is on matches with status ${status}`;
+          result.text = `The list the card ${data.card.name} is on matches with status ${status}`;
         }
       } else {
         result.status = 200;
-        result.text = `Could not determine status of card ${card.name}`;
+        result.text = `Could not determine status of card ${data.card.name}`;
       }
     } else {
       result.status = 200;
-      result.text = `Could not determine status of card ${card.name}`;
+      result.text = `Could not determine status of card ${data.card.name}`;
     }
   } else {
     result.status = getCardRes.status;
-    result.text = `Error getting information from card ${card.name}`;
+    result.text = `Error getting information from card ${data.card.name}`;
   }
   return result;
 }

@@ -395,10 +395,8 @@ export const moveToListAsStatus = async (data) => {
       const status = statusValue.length > 0 ? statusValue[0].value.text : undefined;
       if (status) {
         const listName = getCardRes.text.list.name;
-        console.log("status", status);
-        console.log("listName", listName);
         if (listName != status) {
-          result = await moveToList(data, listName);
+          result = await moveToList(data, status);
         } else {
           result.status = 200;
           result.text = `The list the card ${data.card.name} is on matches with status ${status}`;

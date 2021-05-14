@@ -82,7 +82,9 @@ export default function callback(req, res) {
 
     // move card to another list
   } else if (body.action && body.action.type === "updateCard" && body.action.display.translationKey === "action_move_card_from_list_to_list" && body.action.data.listAfter.name != "Done" && body.action.data.card.name.indexOf("https://") != 0) {
-    setStatusToList(body.action.data.card)
+    Promise.all([
+      setStatusToList(body.action.data.card)
+    ])
       .then((response) => {
         response.map((item) => {
           ret.actions.push(item.text);
@@ -98,9 +100,10 @@ export default function callback(req, res) {
 
     // change status
   } else if (body.action && body.action.type === "updateCustomFieldItem" && body.action.data.customField.name === "Status") {
-    moveToListAsStatus(body.action.data)
+    Promise.all([
+      moveToListAsStatus(body.action.data)
+    ])
       .then((response) => {
-        console.log("response", response);
         response.map((item) => {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;

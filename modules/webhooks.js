@@ -395,6 +395,8 @@ export const moveToListAsStatus = async (data) => {
       const status = statusValue.length > 0 ? statusValue[0].value.text : undefined;
       if (status) {
         const listName = getCardRes.text.list.name;
+        console.log("status", status);
+        console.log("listName", listName);
         if (listName != status) {
           result = await moveToList(data, listName);
         } else {

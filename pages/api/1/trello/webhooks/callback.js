@@ -1,4 +1,4 @@
-import { fillCardId, joinCard, moveToDone, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {

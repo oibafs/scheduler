@@ -1,4 +1,4 @@
-import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
@@ -118,6 +118,21 @@ export default function callback(req, res) {
 
     // complete check list item
   } else if (body.action && body.action.type === "updateCheckItemStateOnCard") {
+    Promise.all([
+      setStatusInProgress(body.action.data.card)
+    ])
+      .then((response) => {
+        response.map((item) => {
+          ret.actions.push(item.text);
+          status = item.status != 200 ? item.status : status;
+        });
+        console.log(status, ret);
+        res.status(status).json(ret);
+      })
+      .catch((error) => {
+        console.log("error", error);
+        res.status(500).send();
+      });
 
     // no action
   } else {

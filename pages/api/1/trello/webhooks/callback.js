@@ -116,6 +116,9 @@ export default function callback(req, res) {
         res.status(500).send();
       });
 
+    // complete check list item
+  } else if (body.action && body.action.type === "updateCheckItemStateOnCard") {
+
     // no action
   } else {
     console.log(status);

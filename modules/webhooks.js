@@ -415,3 +415,43 @@ export const moveToListAsStatus = async (data) => {
   }
   return result;
 }
+
+export const setStatusInProgress = async (card) => {
+
+  const params = {
+    params: {
+      fields: "id",
+      customFields: true,
+      customFieldItems: true
+    }
+  };
+
+  let result = {};
+
+  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+
+  if (getCardRes.status === 200) {
+    const customFields = getCardRes.text.customFields;
+    const customFieldItems = getCardRes.text.customFieldItems;
+
+    let statusIsToDo;
+    try {
+      const fieldStatus = customFields.filter(item => item.name === "Status")[0];
+      const options = fieldStatus.options;
+      const valueToDoId = options.filter(item => item.value.text === "To do")[0].id;
+      statusIsToDo = customFieldItems.filter(item => item.idValue === valueToDoId).length > 0;
+    } catch (error) {
+    }
+
+    if (statusIsToDo) {
+      result = await setStatus(card, "In progress");
+    } else {
+      result.status = 200;
+      result.text = `Status of card ${card.name} is not "To do"`;
+    }
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
+  }
+  return result;
+}

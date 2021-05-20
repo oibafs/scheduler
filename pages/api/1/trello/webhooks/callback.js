@@ -137,8 +137,8 @@ export default function callback(req, res) {
     // vote on a card
   } else if (body.action && body.action.type === "voteOnCard" && body.action.display.translationKey === "action_vote_on_card") {
     Promise.all([
-      setTriggerLabel(body.action.data),
-      removeVote(body.action)
+      setTriggerLabel(body.action.data)
+      //      removeVote(body.action)
     ])
       .then((response) => {
         response.map((item) => {

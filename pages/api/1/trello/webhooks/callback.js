@@ -1,4 +1,4 @@
-import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress, setTriggerLabel } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
@@ -137,7 +137,7 @@ export default function callback(req, res) {
     // vote on a card
   } else if (body.action && body.action.type === "voteOnCard" && body.action.display.translationKey === "action_vote_on_card") {
     Promise.all([
-      //        setStatusInProgress(body.action.data.card)
+      setTriggerLabel(body.action.data)
     ])
       .then((response) => {
         response.map((item) => {

@@ -1,4 +1,4 @@
-import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress, setTriggerLabel, removeVote } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress, setTriggerLabel, removeVote, setActionDaysField } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
@@ -21,7 +21,8 @@ export default function callback(req, res) {
     Promise.all([
       joinCard(body.action.data.card, body.action.idMemberCreator),
       fillCardId(body.action.data.card),
-      setStatusToList(body.action.data.card)
+      setStatusToList(body.action.data.card),
+      setActionDaysField(body.action.data)
     ])
       .then((response) => {
         response.map((item) => {

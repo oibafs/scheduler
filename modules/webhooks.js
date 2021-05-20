@@ -506,3 +506,70 @@ export const removeVote = async (action) => {
   }
   return result;
 }
+
+const setActionDays = async (card, toActionDays) => {
+  const params = {
+    params: {
+      fields: "id",
+      customFields: true,
+      customFieldItems: true
+    }
+  };
+  let result = {};
+
+  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+
+  if (getCardRes.status === 200) {
+    let fieldActionDays;
+    let valueActionDays;
+    try {
+      const actionDays = getCardRes.text.customFields.filter(item => item.name === "Action days")[0];
+      fieldActionDays = actionDays.id;
+      valueActionDays = actionDays.options.filter(item => item.value.text === toActionDays)[0].id;
+
+      const currentValue = getCardRes.text.customFieldItems.filter(item => item.id === fieldActionDays);
+      if (currentValue.length === 0) {
+        const params = {
+          body: {
+            idValue: valueActionDays
+          }
+        };
+
+        const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldActionDays}/item?`, "PUT", params);
+
+        result.status = putCustomFieldItemRes.status;
+        if (putCustomFieldItemRes.status === 200) {
+          result.text = `Updated the value for the 'Action days' custom field on ${card.name} to ${toActionDays}`;
+        } else {
+          result.text = `Error updating the value for the 'Action days' custom field on ${card.name}`;
+        }
+      } else {
+        result.status = 200;
+        result.text = `Card ${card.name} already has 'Action days' field set`;
+      }
+
+    } catch (error) {
+      result.status = 200;
+      result.text = `Error getting information from 'Action days' field on ${card.name}`;
+    }
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
+  }
+  return result;
+}
+
+export const setActionDaysField = async (data) => {
+  let result = {};
+
+  if (data.board.name === "Pessoal") {
+    result = await setActionDays(data.card.id, "Any day");
+  } else if (data.board.name === "Gestão Atividades(Time)") {
+    result = await setActionDays(data.card.id, "Workdays");
+  } else {
+    result.status = 200;
+    result.text = `No action days rule to execute on board ${data.board.name}`;
+  }
+
+  return result;
+}

@@ -474,7 +474,7 @@ export const setTriggerLabel = async (data) => {
           value: labelTriggerId
         }
       };
-      const postCardRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}/idLabels?`, "POST");
+      const postCardRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}/idLabels?`, "POST", params);
       result.status = postCardRes.status;
       if (postCardRes.status === 200) {
         result.text = `Added label 'trigger' to card ${data.card.name}`;

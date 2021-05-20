@@ -455,3 +455,39 @@ export const setStatusInProgress = async (card) => {
   }
   return result;
 }
+
+export const setTriggerLabel = async (data) => {
+  let result = {};
+
+  const getBoardRes = await runQuery(`https://api.trello.com/1/boards/${data.board.id}/labels?`, "GET");
+
+  if (getBoardRes.status === 200) {
+    let labelTriggerId;
+    try {
+      labelTriggerId = getBoardRes.text.filter(item => item.name === "trigger")[0].id;
+    } catch (error) {
+    }
+
+    if (labelTriggerId) {
+      const params = {
+        params: {
+          value: labelTriggerId
+        }
+      };
+      const postCardRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}/idLabels?`, "POST");
+      result.status = postCardRes.status;
+      if (postCardRes.status === 200) {
+        result.text = `Added label 'trigger' to card ${data.card.name}`;
+      } else {
+        result.text = `Error adding the label 'trigger' to card ${data.card.name}`;
+      }
+    } else {
+      result.status = 200;
+      result.text = `Board ${data.board.name} does not seem to have a label 'trigger'`;
+    }
+  } else {
+    result.status = getBoardRes.status;
+    result.text = `Error getting information from board ${data.board.name}`;
+  }
+  return result;
+}

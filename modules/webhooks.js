@@ -563,9 +563,9 @@ export const setActionDaysField = async (data) => {
   let result = {};
 
   if (data.board.name === "Pessoal") {
-    result = await setActionDays(data.card.id, "Any day");
+    result = await setActionDays(data.card, "Any day");
   } else if (data.board.name === "Gestão Atividades(Time)") {
-    result = await setActionDays(data.card.id, "Workdays");
+    result = await setActionDays(data.card, "Workdays");
   } else {
     result.status = 200;
     result.text = `No action days rule to execute on board ${data.board.name}`;

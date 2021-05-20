@@ -19,9 +19,9 @@ export default function callback(req, res) {
   // create card
   if (body.action && (body.action.type === "createCard" || body.action.type === "emailCard") && body.action.data.card.name.indexOf("https://") != 0) {
     Promise.all([
-      joinCard(body.action.data.card, body.action.idMemberCreator),
-      fillCardId(body.action.data.card),
-      setStatusToList(body.action.data.card),
+      // joinCard(body.action.data.card, body.action.idMemberCreator),
+      // fillCardId(body.action.data.card),
+      // setStatusToList(body.action.data.card),
       setActionDaysField(body.action.data)
     ])
       .then((response) => {

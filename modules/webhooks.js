@@ -492,3 +492,17 @@ export const setTriggerLabel = async (data) => {
   }
   return result;
 }
+
+export const removeVote = async (action) => {
+  let result = {};
+
+  const deleteVoteRes = await runQuery(`https://api.trello.com/1/cards/${action.data.card.id}/membersVoted/${action.memberCreator.id}?`, "DELETE");
+
+  result.status = deleteVoteRes.status;
+  if (deleteVoteRes.status === 200) {
+    result.text = `Deleted the vote from card ${action.data.card.name}`;
+  } else {
+    result.text = `Error deleting the vote from card ${action.data.card.name}`;
+  }
+  return result;
+}

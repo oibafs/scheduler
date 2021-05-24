@@ -14,6 +14,7 @@ export default function callback(req, res) {
     console.log("body.action.data", body.action.data);
   } catch (error) {
   }
+  console.log(callbackURL);
 
   if (!verifyTrelloWebhookRequest(req, process.env.TRELLOSECRET, callbackURL)) {
     res.status(401).send();

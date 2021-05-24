@@ -5,7 +5,7 @@ export default function callback(req, res) {
     actions: []
   };
   let status = 200;
-  const callbackURL = "https://scheduler-git-new-webhook-oibafs.vercel.app/api/1/trello/webhooks/callback";
+  const callbackURL = `${process.env.BASEURL}/api/1/trello/webhooks/callback`;
 
   const { body, method } = req;
   console.log("method", method);

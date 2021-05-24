@@ -10,7 +10,10 @@ export default function callback(req, res) {
   const { body, method } = req;
   console.log("method", method);
   console.log("body", body);
-  console.log("body.action.data", body.action.data ? body.action.data : undefined);
+  try {
+    console.log("body.action.data", body.action.data);
+  } catch (error) {
+  }
 
   if (!verifyTrelloWebhookRequest(req, process.env.TRELLOSECRET, callbackURL)) {
     res.status(401).send();

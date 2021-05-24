@@ -1,4 +1,5 @@
 import { runQuery } from "./common";
+const crypto = require("crypto");
 
 export const joinCard = async (card, member) => {
 
@@ -572,4 +573,14 @@ export const setActionDaysField = async (data) => {
   }
 
   return result;
+}
+
+export const verifyTrelloWebhookRequest = (request, secret, callbackURL) => {
+  const base64Digest = (s) => {
+    return crypto.createHmac("sha1", secret).update(s).digest("base64");
+  };
+  const content = JSON.stringify(request.body) + callbackURL;
+  const doubleHash = base64Digest(content);
+  const headerHash = request.headers["x-trello-webhook"];
+  return doubleHash == headerHash;
 }

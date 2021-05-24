@@ -1,15 +1,21 @@
-import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress, setTriggerLabel, removeVote, setActionDaysField } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress, setTriggerLabel, removeVote, setActionDaysField, verifyTrelloWebhookRequest } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
     actions: []
   };
   let status = 200;
+  const callbackURL = "https://scheduler-git-new-webhook-oibafs.vercel.app/api/1/trello/webhooks/callback";
 
   const { body, method } = req;
   console.log("method", method);
   console.log("body", body);
-  console.log("body.action.data", body.action.data);
+  console.log("body.action.data", body.action.data ? body.action.data : undefined);
+
+  if (!verifyTrelloWebhookRequest(req, process.env.TRELLOSECRET, callbackURL)) {
+    res.status(401).send();
+    return;
+  }
 
   if (method === "HEAD") {
     res.status(200).send();

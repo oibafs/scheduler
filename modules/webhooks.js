@@ -613,7 +613,7 @@ export const toggleTodayLabel = async (data) => {
       const getCardRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}?`, "GET", params);
 
       if (getCardRes.status === 200) {
-        const today = card.due ? new Date(card.due) < tomorrow() : false;
+        const today = data.card.due ? new Date(data.card.due) < tomorrow() : false;
         const labelToday = getCardRes.text.labels.filter(i => i.name === "today").length > 0;
         const doneList = getCardRes.text.list.name === "Done";
         const addLabel = today && !labelToday && !doneList;

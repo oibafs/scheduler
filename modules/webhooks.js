@@ -584,7 +584,7 @@ export const verifyTrelloWebhookRequest = (request, secret, callbackURL) => {
   return doubleHash == headerHash;
 }
 
-export const toggleTodayLabel = (data) => {
+export const toggleTodayLabel = async (data) => {
   const tomorrow = () => {
     const today = new Date();
     const midNight = new Date(today.setHours(0, 0, 0, 0));

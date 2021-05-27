@@ -583,3 +583,78 @@ export const verifyTrelloWebhookRequest = (request, secret, callbackURL) => {
   const headerHash = request.headers["x-trello-webhook"];
   return doubleHash == headerHash;
 }
+
+export const toggleTodayLabel = (data) => {
+  const tomorrow = () => {
+    const today = new Date();
+    const midNight = new Date(today.setHours(0, 0, 0, 0));
+    return new Date(midNight.setDate(midNight.getDate() + 1));
+  }
+
+  let result = {};
+
+  const getBoardRes = await runQuery(`https://api.trello.com/1/boards/${data.board.id}/labels?`, "GET");
+
+  if (getBoardRes.status === 200) {
+    let labelTodayId;
+    try {
+      labelTodayId = getBoardRes.text.filter(item => item.name === "today")[0].id;
+    } catch (error) {
+    }
+
+    if (labelTodayId) {
+      const params = {
+        params: {
+          fields: "labels",
+          list: "true"
+        }
+      };
+
+      const getCardRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}?`, "GET", params);
+
+      if (getCardRes.status === 200) {
+        const today = card.due ? new Date(card.due) < tomorrow() : false;
+        const labelToday = getCardRes.text.labels.filter(i => i.name === "today").length > 0;
+        const doneList = getCardRes.text.list.name === "Done";
+        const addLabel = today && !labelToday && !doneList;
+        const deleteLabel = (!today && labelToday) || doneList;
+
+        if (addLabel) {
+          const params = {
+            params: {
+              value: labelTodayId
+            }
+          };
+          const postCardRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}/idLabels?`, "POST", params);
+          result.status = postCardRes.status;
+          if (postCardRes.status === 200) {
+            result.text = `Added label 'today' to card ${data.card.name}`;
+          } else {
+            result.text = `Error adding the label 'today' to card ${data.card.name}`;
+          }
+        } else if (deleteLabel) {
+          const deleteLabelRes = await runQuery(`https://api.trello.com/1/cards/${data.card.id}/idLabels/${labelTodayId}?`, "DELETE");
+          result.status = deleteLabelRes.status;
+          if (deleteLabelRes.status === 200) {
+            result.text = `Deleted the label today from card ${data.card.name}`;
+          } else {
+            result.text = `Error deleting the label today from card ${data.card.name}`;
+          }
+        } else {
+          result.status = 200;
+          result.text = `No change on label 'today' for card ${data.card.name}`;
+        }
+      } else {
+        result.status = getCardRes.status;
+        result.text = `Error getting information from card ${data.card.name}`;
+      }
+    } else {
+      result.status = 200;
+      result.text = `Board ${data.board.name} does not seem to have a label 'today'`;
+    }
+  } else {
+    result.status = getBoardRes.status;
+    result.text = `Error getting information from board ${data.board.name}`;
+  }
+  return result;
+}

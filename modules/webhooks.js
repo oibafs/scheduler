@@ -772,7 +772,7 @@ export const setImportance = async (card) => {
       const params = {
         body: {
           value: {
-            number: newImportance
+            number: newImportance.toString()
           }
         }
       };

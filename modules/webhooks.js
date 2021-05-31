@@ -1,3 +1,4 @@
+import { get } from "http";
 import { runQuery } from "./common";
 const crypto = require("crypto");
 
@@ -655,6 +656,141 @@ export const toggleTodayLabel = async (data) => {
   } else {
     result.status = getBoardRes.status;
     result.text = `Error getting information from board ${data.board.name}`;
+  }
+  return result;
+}
+
+const fieldValue = (customFields, customFieldItems, name) => {
+  try {
+    const model = customFields.filter(i => i.name === name)[0];
+    const field = customFieldItems.filter(i => i.idCustomField === model.id)[0];
+    switch (model.type) {
+      case ("list"):
+        return model.options.findIndex(i => i.id === field.idValue).toString();
+      case ("checkbox"):
+        return field.value.checked;
+      default:
+        return field.value[model.type];
+    }
+  }
+  catch (err) {
+    return "null";
+  }
+}
+
+export const setImportance = async (card) => {
+
+  const params = {
+    params: {
+      fields: "labels,due,list",
+      customFields: true,
+      customFieldItems: true
+    }
+  };
+
+  let result = {};
+
+  const getCardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}?`, "GET", params);
+
+  if (getCardRes.status === 200) {
+    const customFields = getCardRes.text.customFields;
+    const customFieldItems = getCardRes.text.customFieldItems;
+    const labels = getCardRes.text.labels;
+    const due = getCardRes.text.due;
+    const doneList = getCardRes.text.list.name === "Done";
+
+    const priority = fieldValue(customFields, customFieldItems, "Priority");
+    const star = labels.filter(i => i.name === "star").length > 0;
+    const due = due ? new Date(due) : new Date("2999/12/31");
+    const category = fieldValue(customFields, customFieldItems, "Category");
+    let nextAction = new Date(fieldValue(customFields, customFieldItems, "Deadline"));
+    const importance = fieldValue(customFields, customFieldItems, "Importance");
+    let newImportance = 2;
+
+    if (!doneList) {
+
+      switch (priority) {
+        case "0":
+          newImportance += 3;
+          break;
+
+        case "1":
+          newImportance += 2;
+          break;
+
+        case "2":
+          newImportance += 1;
+          break;
+
+        default:
+          break;
+      }
+
+      newImportance += star ? 1 : 0;
+
+      const today = new Date();
+
+      // Calculate difference between two dates in days
+      const dateDiff = (originalDate, futureDate) => {
+        const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+        return Math.floor((futureDate - originalDate) / _MS_PER_DAY);
+      }
+
+      const daysToDue = dateDiff(today, due);
+
+      if (daysToDue < 0) {
+        newImportance += 3;
+      } else if (daysToDue < 1) {
+        newImportance += 2;
+      }
+
+      newImportance += (category === "3") ? 1 : 0;
+
+      nextAction = isNaN(nextAction) ? new Date("2999/12/31") : nextAction;
+      const daysToNextAction = dateDiff(today, nextAction);
+
+      if (daysToNextAction < 0) {
+        newImportance += 6;
+      } else if (daysToNextAction < 1) {
+        newImportance += 5;
+      } else if (daysToNextAction < 2) {
+        newImportance += 3;
+      } else if (daysToNextAction < 7) {
+        newImportance += 2;
+      } else if (daysToNextAction < 14) {
+        newImportance += 1;
+      }
+
+    } else {
+      newImportance = 0;
+    }
+
+    if (newImportance != importance) {
+      const fieldImportance = getCardRes.text.customFields.filter(item => item.name === "Importance")[0].id;
+
+      const params = {
+        body: {
+          value: {
+            number: newImportance
+          }
+        }
+      };
+
+      const putCustomFieldItemRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/customField/${fieldImportance}/item?`, "PUT", params);
+
+      result.status = putCustomFieldItemRes.status;
+      if (putCustomFieldItemRes.status === 200) {
+        result.text = `Updated the value for the Importance custom field on ${card.name} to ${newImportance}`;
+      } else {
+        result.text = `Error updating the value for the Importance custom field on ${card.name}`;
+      }
+    } else {
+      result.status = 200;
+      result.text = `Importance of card ${card.name} has not changed`;
+    }
+  } else {
+    result.status = getCardRes.status;
+    result.text = `Error getting information from card ${card.name}`;
   }
   return result;
 }

@@ -1,4 +1,4 @@
-import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress, setTriggerLabel, removeVote, setActionDaysField, verifyTrelloWebhookRequest, toggleTodayLabel } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress, setTriggerLabel, removeVote, setActionDaysField, verifyTrelloWebhookRequest, toggleTodayLabel, setImportance } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
@@ -167,7 +167,30 @@ export default function callback(req, res) {
     // due date updated
   } else if (body.action && body.action.type === "updateCard" && (body.action.display.translationKey === "action_added_a_due_date" || body.action.display.translationKey === "action_changed_a_due_date")) {
     Promise.all([
-      toggleTodayLabel(body.action.data)
+      toggleTodayLabel(body.action.data),
+      setImportance(body.action.data.card)
+    ])
+      .then((response) => {
+        response.map((item) => {
+          ret.actions.push(item.text);
+          status = item.status != 200 ? item.status : status;
+        });
+        console.log(status, ret);
+        res.status(status).json(ret);
+      })
+      .catch((error) => {
+        console.log("error", error);
+        res.status(500).send();
+      });
+
+    // priority or category or deadline changed or label star added or label star removed
+  } else if (
+    body.action && (
+      (body.action.type === "updateCustomFieldItem" && (body.action.data.customField.name === "Priority" || body.action.data.customField.name === "Category" || body.action.data.customField.name === "Deadline")) ||
+      ((body.action.type === "addLabelToCard" || body.action.type === "removeLabelFromCard") && body.action.data.text === "star")
+    )) {
+    Promise.all([
+      setImportance(body.action.data.card)
     ])
       .then((response) => {
         response.map((item) => {

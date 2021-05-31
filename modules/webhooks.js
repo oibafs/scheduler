@@ -682,9 +682,10 @@ export const setImportance = async (card) => {
 
   const params = {
     params: {
-      fields: "labels,due,list",
-      // customFields: true,
-      // customFieldItems: true
+      fields: "labels,due",
+      customFields: true,
+      customFieldItems: true,
+      list: true
     }
   };
 
@@ -697,7 +698,6 @@ export const setImportance = async (card) => {
     const customFieldItems = getCardRes.text.customFieldItems;
     const labels = getCardRes.text.labels;
     const dueDate = getCardRes.text.due;
-    console.log("text", getCardRes.text);
     const doneList = getCardRes.text.list.name === "Done";
 
     const priority = fieldValue(customFields, customFieldItems, "Priority");

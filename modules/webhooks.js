@@ -683,8 +683,8 @@ export const setImportance = async (card) => {
   const params = {
     params: {
       fields: "labels,due,list",
-      customFields: true,
-      customFieldItems: true
+      // customFields: true,
+      // customFieldItems: true
     }
   };
 

@@ -696,12 +696,12 @@ export const setImportance = async (card) => {
     const customFields = getCardRes.text.customFields;
     const customFieldItems = getCardRes.text.customFieldItems;
     const labels = getCardRes.text.labels;
-    const due = getCardRes.text.due;
+    const dueDate = getCardRes.text.due;
     const doneList = getCardRes.text.list.name === "Done";
 
     const priority = fieldValue(customFields, customFieldItems, "Priority");
     const star = labels.filter(i => i.name === "star").length > 0;
-    const due = due ? new Date(due) : new Date("2999/12/31");
+    const due = dueDate ? new Date(dueDate) : new Date("2999/12/31");
     const category = fieldValue(customFields, customFieldItems, "Category");
     let nextAction = new Date(fieldValue(customFields, customFieldItems, "Deadline"));
     const importance = fieldValue(customFields, customFieldItems, "Importance");

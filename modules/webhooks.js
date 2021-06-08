@@ -833,7 +833,7 @@ const sortList = async (idBoard, idList) => {
     runQuery(`https://api.trello.com/1/lists/${idList}/cards?`, "GET", params)
   ])
     .then((response) => {
-      console.log(response);
+      console.log("response", response);
       return result;
     });
 

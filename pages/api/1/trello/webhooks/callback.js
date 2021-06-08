@@ -1,4 +1,4 @@
-import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress, setTriggerLabel, removeVote, setActionDaysField, verifyTrelloWebhookRequest, toggleTodayLabel, setImportance } from "../../../../../modules/webhooks.js";
+import { fillCardId, joinCard, moveToList, repeatCard, leaveCard, setDateConcluded, removeTodayLabel, setImportanceZero, setStatus, setStatusToList, moveToListAsStatus, setStatusInProgress, setTriggerLabel, removeVote, setActionDaysField, verifyTrelloWebhookRequest, toggleTodayLabel, setImportance, sortCard } from "../../../../../modules/webhooks.js";
 
 export default function callback(req, res) {
   let ret = {
@@ -208,7 +208,7 @@ export default function callback(req, res) {
     // importance changed
   } else if (body.action && body.action.type === "updateCustomFieldItem" && body.action.data.customField.name === "Importance") {
     Promise.all([
-      setImportance(body.action.data.card)
+      sortCard(body.action.data)
     ])
       .then((response) => {
         response.map((item) => {

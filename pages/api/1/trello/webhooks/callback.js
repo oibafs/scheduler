@@ -211,16 +211,17 @@ export default function callback(req, res) {
       sortCard(body.action.data)
     ])
       .then((response) => {
-        response.map((item) => {
-          ret.actions.push(item.text);
-          status = item.status != 200 ? item.status : status;
-        });
-        console.log(status, ret);
-        res.status(status).json(ret);
-      })
-      .catch((error) => {
-        console.log("error", error);
-        res.status(500).send();
+        /*         response.map((item) => {
+                  ret.actions.push(item.text);
+                  status = item.status != 200 ? item.status : status;
+                });
+                console.log(status, ret);
+                res.status(status).json(ret);
+              })
+              .catch((error) => {
+                console.log("error", error);
+                res.status(500).send(); */
+        res.status(200).send();
       });
 
     // no action

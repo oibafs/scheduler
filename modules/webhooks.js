@@ -810,6 +810,7 @@ export const sortCard = async (data) => {
 
   if (getCardRes.status === 200) {
     const idList = getCardRes.text.idList;
+    console.log("sortList");
     result = await sortList(data.board.id, idList);
   } else {
     result.status = getCardRes.status;

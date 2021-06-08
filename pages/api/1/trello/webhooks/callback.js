@@ -205,6 +205,24 @@ export default function callback(req, res) {
         res.status(500).send();
       });
 
+    // importance changed
+  } else if (body.action && body.action.type === "updateCustomFieldItem" && body.action.data.customField.name === "Importance") {
+    Promise.all([
+      setImportance(body.action.data.card)
+    ])
+      .then((response) => {
+        response.map((item) => {
+          ret.actions.push(item.text);
+          status = item.status != 200 ? item.status : status;
+        });
+        console.log(status, ret);
+        res.status(status).json(ret);
+      })
+      .catch((error) => {
+        console.log("error", error);
+        res.status(500).send();
+      });
+
     // no action
   } else {
     console.log(status);

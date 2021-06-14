@@ -198,6 +198,23 @@ export default function callback(req, res) {
           status = item.status != 200 ? item.status : status;
         });
         console.log(status, ret);
+        // Sort list after changing importance
+        if (status === 200) {
+          Promise.all([
+            sortCard(body.action.data)
+          ])
+            .then((response) => {
+              response.map((item) => {
+                ret.actions.push(item.text);
+                status = item.status != 200 ? item.status : status;
+              });
+              console.log(status, ret);
+            })
+            .catch((error) => {
+              console.log("error", error);
+              res.status(500).send();
+            });
+        }
         res.status(status).json(ret);
       })
       .catch((error) => {

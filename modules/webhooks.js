@@ -480,7 +480,6 @@ export const setTriggerLabel = async (data) => {
       if (postCardRes.status === 200) {
         result.text = `Added label 'trigger' to card ${data.card.name}`;
       } else {
-        console.log(postCardRes);
         result.text = `Error adding the label 'trigger' to card ${data.card.name}`;
       }
     } else {

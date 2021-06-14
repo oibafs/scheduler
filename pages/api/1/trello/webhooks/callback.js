@@ -200,6 +200,7 @@ export default function callback(req, res) {
         console.log(status, ret);
         // Sort list after changing importance
         if (status === 200) {
+          console.log("Sort list");
           Promise.all([
             sortCard(body.action.data)
           ])

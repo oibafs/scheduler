@@ -205,6 +205,7 @@ export default function callback(req, res) {
             sortCard(body.action.data)
           ])
             .then((response) => {
+              console.log("Response", response);
               response.map((item) => {
                 ret.actions.push(item.text);
                 status = item.status != 200 ? item.status : status;

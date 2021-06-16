@@ -177,6 +177,8 @@ export default async function repeat(req, res) {
             });
 
             // cardId
+            console.log("newCard", newCard);
+            console.log("customFields.idCustomFieldcardId", customFields.idCustomFieldcardId);
             customFields.cardId = newCard;
             putJson.customFields.push({
               idCustomField: customFields.idCustomFieldcardId,
@@ -184,6 +186,7 @@ export default async function repeat(req, res) {
                 idValue: JSON.parse(JSON.stringify(customFields.cardId))
               }
             });
+            console.log("putJson.customFields", putJson.customFields);
 
             // Change main fields of new card
             const changeMainRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/?`, "PUT", putJson.main);
@@ -196,6 +199,7 @@ export default async function repeat(req, res) {
               for (let i = 0; i < putJson.customFields.length; i++) {
                 const changeCustomFieldRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/customField/${putJson.customFields[i].idCustomField}/item?`, "PUT", putJson.customFields[i]);
                 changeCFRes = changeCustomFieldRes;
+                console.log("changeCustomFieldRes", changeCustomFieldRes);
 
                 if (changeCustomFieldRes.status != 200) {
                   break;

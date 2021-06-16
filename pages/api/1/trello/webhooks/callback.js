@@ -8,13 +8,14 @@ export default function callback(req, res) {
   const callbackURL = `${process.env.BASEURL}/api/1/trello/webhooks/callback`;
 
   const { body, method } = req;
-  console.log("method", method);
-  console.log("body", body);
+  // console.log("method", method);
+  // console.log("body", body);
   try {
-    console.log("body.action.data", body.action.data);
+    // console.log("body.action.data", body.action.data);
+    console.log("card.id:", body.action.data.card.id, "action.type:", body.action.type);
   } catch (error) {
   }
-  console.log(callbackURL);
+  // console.log(callbackURL);
 
   if (!verifyTrelloWebhookRequest(req, process.env.TRELLOSECRET, callbackURL)) {
     res.status(401).send();

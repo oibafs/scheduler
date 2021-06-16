@@ -176,6 +176,15 @@ export default async function repeat(req, res) {
               }
             });
 
+            // cardId
+            customFields.cardId = newCard;
+            putJson.customFields.push({
+              idCustomField: customFields.idCustomFieldcardId,
+              body: {
+                idValue: JSON.parse(JSON.stringify(customFields.cardId))
+              }
+            });
+
             // Change main fields of new card
             const changeMainRes = await runQuery(`https://api.trello.com/1/cards/${newCard}/?`, "PUT", putJson.main);
 
@@ -210,7 +219,7 @@ export default async function repeat(req, res) {
                 }
 
                 if (putJson.checkListItems.length === 0 || changeCLRes.status === 200) {
-                  const result = await joinCard(copyJson, "fabioscaravelli");
+                  const result = await joinCard(copyJson, "57d7f08ebabb7ac948933c64");
                   console.log(result);
 
                   if (result.status === 200) {

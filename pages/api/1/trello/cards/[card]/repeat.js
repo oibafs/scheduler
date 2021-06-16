@@ -225,7 +225,7 @@ export default async function repeat(req, res) {
                 }
 
                 if (putJson.checkListItems.length === 0 || changeCLRes.status === 200) {
-                  // const result = await joinCard(copyJson, "57d7f08ebabb7ac948933c64");
+                  await joinCard(copyJson, "57d7f08ebabb7ac948933c64");
                   const result = { status: 200 };
                   console.log(result);
 

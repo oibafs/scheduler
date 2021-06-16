@@ -1,4 +1,5 @@
 import { runQuery, getCustomFields, getCheckListItems, addDays, daysUntilRepeat, dateDiff } from '../../../../../../modules/common.js';
+import { joinCard } from '../../../../../../modules/webhooks.js';
 
 export default async function repeat(req, res) {
   const startHours = 11;
@@ -209,10 +210,15 @@ export default async function repeat(req, res) {
                 }
 
                 if (putJson.checkListItems.length === 0 || changeCLRes.status === 200) {
+                  const result = await joinCard(newCard, "fabioscaravelli");
 
-                  res.status(201).json({
-                    newCard
-                  })
+                  if (result.status === 200) {
+                    res.status(201).json({
+                      newCard
+                    });
+                  } else { // Error joining the card
+                    res.status(result.status).send(result.text);
+                  }
 
                 } else { // Error changing check list items
                   res.status(changeCLRes.status).send(changeCLRes.text);

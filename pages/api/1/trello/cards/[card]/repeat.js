@@ -211,6 +211,7 @@ export default async function repeat(req, res) {
 
                 if (putJson.checkListItems.length === 0 || changeCLRes.status === 200) {
                   const result = await joinCard(newCard, "fabioscaravelli");
+                  console.log(result);
 
                   if (result.status === 200) {
                     res.status(201).json({

@@ -3,6 +3,8 @@ import { runQuery } from "./common";
 const crypto = require("crypto");
 
 export const joinCard = async (card, member) => {
+  console.log("card", card);
+  console.log("member", member);
 
   const params = {
     body: {

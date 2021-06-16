@@ -13,6 +13,7 @@ export default function callback(req, res) {
   try {
     // console.log("body.action.data", body.action.data);
     console.log("card.id:", body.action.data.card.id, "action.type:", body.action.type);
+    console.log("body.action.data.card", body.action.data.card, "body.action.idMemberCreator", body.action.idMemberCreator);
   } catch (error) {
   }
   // console.log(callbackURL);

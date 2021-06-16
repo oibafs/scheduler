@@ -183,7 +183,9 @@ export default async function repeat(req, res) {
             putJson.customFields.push({
               idCustomField: customFields.idCustomFieldcardId,
               body: {
-                idValue: JSON.parse(JSON.stringify(customFields.cardId))
+                value: {
+                  text: JSON.parse(JSON.stringify(customFields.cardId))
+                }
               }
             });
             console.log("putJson.customFields", putJson.customFields);

@@ -24,6 +24,7 @@ function cards({ cards }) {
     cards.map((item) => {
       const activity = {
         importance: item.importance,
+        due: item.due,
         name: item.name,
         url: item.url
       }
@@ -36,7 +37,7 @@ function cards({ cards }) {
           {activityList.map((activity) => (
             <li>
               <a href={activity.url}>
-                <p>{`Importance: ${activity.importance} - ${activity.name}`}</p>
+                <p>{`Importance: ${activity.importance} - Due: ${activity.due} - ${activity.name}`}</p>
               </a>
             </li>
             // <li>{activity.name}</li>

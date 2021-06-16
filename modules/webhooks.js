@@ -92,6 +92,7 @@ export const repeatCard = async (card) => {
 
     if (recurring) {
       const repeatCardRes = await runQuery(`${process.env.BASEURL}/api/1/trello/cards/${card.id}/repeat`, "POST", undefined, undefined, true);
+      console.log("repeatCardRes", repeatCardRes);
 
       result.status = repeatCardRes.status;
       if (repeatCardRes.status === 201) {

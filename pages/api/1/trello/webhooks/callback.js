@@ -8,13 +8,13 @@ export default function callback(req, res) {
   const callbackURL = `${process.env.BASEURL}/api/1/trello/webhooks/callback`;
 
   const { body, method } = req;
-  // console.log("method", method);
-  // console.log("body", body);
+  console.log("method", method);
+  console.log("body", body);
   try {
-    // console.log("body.action.data", body.action.data);
+    console.log("body.action.data", body.action.data);
   } catch (error) {
   }
-  // console.log(callbackURL);
+  console.log(callbackURL);
 
   if (!verifyTrelloWebhookRequest(req, process.env.TRELLOSECRET, callbackURL)) {
     res.status(401).send();
@@ -40,11 +40,11 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        // console.log(status, ret);
+        console.log(status, ret);
         res.status(status).json(ret);
       })
       .catch((error) => {
-        // console.log("error", error);
+        console.log("error", error);
         res.status(500).send();
       });
 
@@ -60,11 +60,11 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        // console.log(status, ret);
+        console.log(status, ret);
         res.status(status).json(ret);
       })
       .catch((error) => {
-        // console.log("error", error);
+        console.log("error", error);
         res.status(500).send();
       });
 
@@ -83,11 +83,11 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        // console.log(status, ret);
+        console.log(status, ret);
         res.status(status).json(ret);
       })
       .catch((error) => {
-        // console.log("error", error);
+        console.log("error", error);
         res.status(500).send();
       });
 
@@ -101,11 +101,11 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        // console.log(status, ret);
+        console.log(status, ret);
         res.status(status).json(ret);
       })
       .catch((error) => {
-        // console.log("error", error);
+        console.log("error", error);
         res.status(500).send();
       });
 
@@ -119,11 +119,11 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        // console.log(status, ret);
+        console.log(status, ret);
         res.status(status).json(ret);
       })
       .catch((error) => {
-        // console.log("error", error);
+        console.log("error", error);
         res.status(500).send();
       });
 
@@ -137,11 +137,11 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        // console.log(status, ret);
+        console.log(status, ret);
         res.status(status).json(ret);
       })
       .catch((error) => {
-        // console.log("error", error);
+        console.log("error", error);
         res.status(500).send();
       });
 
@@ -156,11 +156,11 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        // console.log(status, ret);
+        console.log(status, ret);
         res.status(status).json(ret);
       })
       .catch((error) => {
-        // console.log("error", error);
+        console.log("error", error);
         res.status(500).send();
       });
 
@@ -175,11 +175,11 @@ export default function callback(req, res) {
           ret.actions.push(item.text);
           status = item.status != 200 ? item.status : status;
         });
-        // console.log(status, ret);
+        console.log(status, ret);
         res.status(status).json(ret);
       })
       .catch((error) => {
-        // console.log("error", error);
+        console.log("error", error);
         res.status(500).send();
       });
 
@@ -226,7 +226,7 @@ export default function callback(req, res) {
 
     // no action
   } else {
-    // console.log(status);
+    console.log(status);
     res.status(200).send();
     return;
   }

@@ -13,6 +13,7 @@ export const joinCard = async (card, member) => {
   let result = {};
 
   const cardRes = await runQuery(`https://api.trello.com/1/cards/${card.id}/idMembers?`, "POST", params);
+  console.log("cardRes", cardRes);
 
   result.status = cardRes.status;
   if (cardRes.status === 200) {

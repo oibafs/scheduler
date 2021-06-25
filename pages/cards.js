@@ -26,10 +26,41 @@ function cards({ cards }) {
         importance: item.importance,
         due: item.due,
         name: item.name,
-        url: item.url
+        url: item.url,
+        board: item.nameBoard,
+        parentCardId: item.parentCardId,
+        id: item.id
       }
       activityList.push(activity)
     })
+
+    const x = 2;
+
+    return (
+      <div>
+        <ul>
+          {activityList.map((activity) => (
+            <li>
+              {activity.parentCardId === "" ?
+                <li>
+                  <a href={activity.url}>
+                    <p>{`Importance: ${activity.importance} - Due: ${activity.due} - ${activity.board} - ${activity.name}`}</p>
+                  </a>
+                </li>
+                :
+                <ul>
+                  <li>
+                    <a href={activity.url}>
+                      <p>{`Importance: ${activity.importance} - Due: ${activity.due} - ${activity.name}`}</p>
+                    </a>
+                  </li>
+                </ul>
+              }
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
 
     return (
       <div>
@@ -37,7 +68,7 @@ function cards({ cards }) {
           {activityList.map((activity) => (
             <li>
               <a href={activity.url}>
-                <p>{`Importance: ${activity.importance} - Due: ${activity.due} - ${activity.name}`}</p>
+                <p>{`Importance: ${activity.importance} - Due: ${activity.due} - ${activity.name} - ${activity.board}`}</p>
               </a>
             </li>
             // <li>{activity.name}</li>

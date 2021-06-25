@@ -50,7 +50,7 @@ const fieldValue = (customFields, customFieldItems, name) => {
 export const getCards = async () => {
   const params = {
     params: {
-      fields: "name,url,dueComplete,due",
+      fields: "name,url,dueComplete,due,idBoard",
       customFieldItems: true
     }
   };
@@ -96,6 +96,14 @@ export const getCards = async () => {
     }
     customFieldsDef = customFieldsDef.map(item => item["200"]);
 
+    const boardParams = {
+      params: {
+        fields: "name"
+      }
+    };
+    const getBoardsRes = await runQuery(`https://api.trello.com/1/members/me/boards?`, "GET", boardParams);
+    const boards = getBoardsRes.text;
+
     ret = ret.map(item => {
       item.importance = fieldValue(customFieldsDef, item.customFieldItems, "Importance");
       const sortImportance = (100 - (isNaN(parseInt(item.importance)) ? 1 : item.importance)).toString();
@@ -103,6 +111,19 @@ export const getCards = async () => {
       item.deadline = fieldValue(customFieldsDef, item.customFieldItems, "Deadline");
       item.startdate = fieldValue(customFieldsDef, item.customFieldItems, "Start date");
       item.sorter = sortImportance + item.priority + item.due + item.deadline + item.startdate;
+      const nameBoard = boards.filter(board => board.id === item.idBoard)[0].name;
+      item.nameBoard = nameBoard;
+      switch (nameBoard) {
+        case "Immigration process":
+          item.parentCardId = "606df0cf635a8c73efe784ca";
+          break;
+        case "Scheduler":
+          item.parentCardId = "60329f2919d4f48ae12514b0";
+          break;
+        default:
+          item.parentCardId = "";
+          break;
+      }
       return item;
     })
 
@@ -115,8 +136,18 @@ export const getCards = async () => {
       return 0;
     });
 
+    const retMain = ret2.filter(item => item.parentCardId === "");
+    const retSub = ret2.filter(item => item.parentCardId != "");
+    retSub.reverse();
+    retSub.map(item => {
+      const index = retMain.findIndex(obj => obj.id === item.parentCardId);
+      if (index !== -1) {
+        retMain.splice(index + 1, 0, item);
+      }
+    })
+
     console.log(ret2);
-    return ret2;
+    return retMain;
   }
   else {
     return {};

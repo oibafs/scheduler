@@ -24,7 +24,7 @@ function cards({ cards }) {
     cards.map((item) => {
       const activity = {
         today: item.today,
-        teuku: "TODAY",
+        teuku: item.today,
         importance: item.importance,
         due: item.due,
         name: item.name,

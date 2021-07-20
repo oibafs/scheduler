@@ -29,7 +29,8 @@ function cards({ cards }) {
         url: item.url,
         board: item.nameBoard,
         parentCardId: item.parentCardId,
-        id: item.id
+        id: item.id,
+        today: item.today ? "TODAY" : ""
       }
       activityList.push(activity)
     })
@@ -44,7 +45,7 @@ function cards({ cards }) {
               {activity.parentCardId === "" ?
                 <li>
                   <a href={activity.url}>
-                    <p>{`Importance: ${activity.importance} - Due: ${activity.due} - ${activity.board} - ${activity.name}`}</p>
+                    <p>{`${activity.today} Importance: ${activity.importance} - Due: ${activity.due} - ${activity.board} - ${activity.name}`}</p>
                   </a>
                 </li>
                 :

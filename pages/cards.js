@@ -33,7 +33,7 @@ function cards({ cards }) {
         today: item.today ? "TODAY" : ""
       }
       activityList.push(activity);
-      console.log(item.today);
+      console.log(item.today, activity.today);
     })
 
     const x = 2;

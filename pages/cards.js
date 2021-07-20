@@ -46,7 +46,7 @@ function cards({ cards }) {
               {activity.parentCardId === "" ?
                 <li>
                   <a href={activity.url}>
-                    <p>{`${activity.today} Importances: ${activity.importance} - Due: ${activity.due} - ${activity.board} - ${activity.name}`}</p>
+                    <p>{`${activity.today}`}</p>
                   </a>
                 </li>
                 :

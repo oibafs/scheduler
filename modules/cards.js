@@ -103,6 +103,8 @@ export const getCards = async () => {
     };
     const getBoardsRes = await runQuery(`https://api.trello.com/1/members/me/boards?`, "GET", boardParams);
     const boards = getBoardsRes.text;
+    const now = new Date();
+    const tomorrow = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0);
 
     ret = ret.map(item => {
       item.importance = fieldValue(customFieldsDef, item.customFieldItems, "Importance");
@@ -111,7 +113,7 @@ export const getCards = async () => {
       item.deadline = fieldValue(customFieldsDef, item.customFieldItems, "Deadline");
       item.startDate = fieldValue(customFieldsDef, item.customFieldItems, "Start date");
       item.sorter = sortImportance + item.priority + item.due + item.deadline + item.startDate;
-      item.today = (new Date(item.due) <= new Date() ? "TODAY" : "future");
+      item.today = (new Date(item.due) <= tomorrow ? true : false);
       const nameBoard = boards.filter(board => board.id === item.idBoard)[0].name;
       item.nameBoard = nameBoard;
       switch (nameBoard) {

@@ -23,7 +23,7 @@ function cards({ cards }) {
     const activityList = []
     cards.map((item) => {
       const activity = {
-        today: item.today,
+        today: item.today ? "TODAY" : "",
         importance: item.importance,
         due: item.due,
         name: item.name,
@@ -46,7 +46,7 @@ function cards({ cards }) {
               {activity.parentCardId === "" ?
                 <li>
                   <a href={activity.url}>
-                    <p>{`Importance: ${activity.today} - ${activity.importance} - Due: ${activity.due} - ${activity.board} - ${activity.name}`}</p>
+                    <p>{`${activity.today} Importance: ${activity.importance} - Due: ${activity.due} - ${activity.board} - ${activity.name}`}</p>
                   </a>
                 </li>
                 :

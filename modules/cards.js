@@ -111,7 +111,7 @@ export const getCards = async () => {
       item.deadline = fieldValue(customFieldsDef, item.customFieldItems, "Deadline");
       item.startDate = fieldValue(customFieldsDef, item.customFieldItems, "Start date");
       item.sorter = sortImportance + item.priority + item.due + item.deadline + item.startDate;
-      item.today = item.due <= new Date() ? true : false;
+      item.today = item.due <= new Date() ? "TODAY" : "";
       const nameBoard = boards.filter(board => board.id === item.idBoard)[0].name;
       item.nameBoard = nameBoard;
       switch (nameBoard) {

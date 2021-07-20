@@ -23,6 +23,7 @@ function cards({ cards }) {
     const activityList = []
     cards.map((item) => {
       const activity = {
+        today: item.today,
         importance: item.importance,
         due: item.due,
         name: item.name,
@@ -30,7 +31,6 @@ function cards({ cards }) {
         board: item.nameBoard,
         parentCardId: item.parentCardId,
         id: item.id,
-        today: item.today
       }
       activityList.push(activity);
       console.log(item.today, activity.today);
